@@ -1,0 +1,38 @@
+name: Update Eidolon Archive
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 8 * * *"
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run updater script
+        shell: pwsh
+        run: ./atualizar_eidolons.ps1
+
+      - name: Commit and push changes
+        shell: pwsh
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          if ((git status --porcelain).Length -eq 0) {
+            Write-Host "No changes to commit."
+            exit 0
+          }
+
+          git add index.html version.txt assets/eidolons
+          git commit -m "chore: auto-update eidolon archive"
+          git push

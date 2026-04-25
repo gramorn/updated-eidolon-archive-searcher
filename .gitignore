@@ -1,0 +1,24 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# PowerShell and logs
+*.log
+*.tmp
+
+# Python (if used later)
+__pycache__/
+*.pyc
+
+# Node (if used later)
+node_modules/
+
+# Build output (future-proof)
+dist/
+build/
