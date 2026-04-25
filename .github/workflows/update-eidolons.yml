@@ -3,7 +3,8 @@ name: Update Eidolon Archive
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 8 * * *"
+    # 09:00 GMT-3 every Thursday = 12:00 UTC every Thursday
+    - cron: "0 12 * * 4"
 
 permissions:
   contents: write
