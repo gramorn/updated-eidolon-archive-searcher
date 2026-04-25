@@ -53,32 +53,3 @@ Or run:
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File "EidolonApp.ps1"
 ```
-
-## Publish as Static Site
-
-You can host this project for free on GitHub Pages.
-
-Basic steps:
-
-1. Push this repository to GitHub.
-2. Enable Pages in repository settings.
-3. Deploy from branch `main`, folder `/ (root)`.
-
-Note: `EidolonApp.ps1` and `Iniciar.vbs` are local desktop helpers. They do not run in a hosted browser environment.
-
-## Automatic Updates in GitHub
-
-This repository includes a GitHub Actions workflow in `.github/workflows/update-eidolons.yml`.
-
-It can:
-
-- run manually
-- run daily on schedule
-- regenerate `index.html` and `version.txt`
-- commit and push updates when changes are detected
-
-After enabling Actions and Pages, your hosted site can stay up to date automatically.
-
-## License
-
-MIT License. See `LICENSE`.
