@@ -103,6 +103,32 @@ function Get-Local-Icon {
     return $RemoteUrl
 }
 
+function Get-ComboOverride {
+    param(
+        [array]$Eidolons,
+        [string]$Star3,
+        [string]$Star4
+    )
+
+    $comboKey = (($Eidolons | ForEach-Object { Normalize-Key $_.Name } | Sort-Object) -join "|")
+
+    switch ($comboKey) {
+        "faust|summerguanyu|summershutendoji" {
+            return [pscustomobject]@{
+                Category = "MAX CRIT DMG"
+                Star3 = "Max CRIT DMG +4%"
+                Star4 = "Max CRIT DMG +8%"
+            }
+        }
+    }
+
+    return [pscustomobject]@{
+        Category = Get-Category $Star3
+        Star3 = $Star3
+        Star4 = $Star4
+    }
+}
+
 function Build-PageHtml {
     param(
         [array]$Rows,
@@ -184,11 +210,11 @@ function Build-PageHtml {
     [void]$sb.AppendLine("    body[data-theme='light'] { --bg:#fff6ef; --bg-top:#fffdf8; --card:#fffdf9; --ink:#2d1f1a; --muted:#6c5a53; --line:#efddd3; --accent:#cc5f2e; --th-bg:#fff4ec; --chip-bg:#fff7f1; --chip-line:#f0dfd5; --icon-bg:#ffffff; --icon-line:#e8d3c7; --input-bg:#ffffff; --input-ink:#2d1f1a; }")
     [void]$sb.AppendLine("    * { box-sizing:border-box; }")
     [void]$sb.AppendLine("    html { background-color:#0f141d; } body { margin:0; font-family: `"Segoe UI`", Tahoma, sans-serif; background: radial-gradient(circle at top, var(--bg-top), var(--bg)); color:var(--ink); } body[data-theme='light'] { background-color:#fff6ef; }")
-    [void]$sb.AppendLine("    .wrap { width:min(1100px, 94vw); margin: 20px auto 48px; }")
-    [void]$sb.AppendLine("    h1 { margin:0 0 8px; font-size: clamp(1.4rem, 2.5vw, 2rem); }")
-    [void]$sb.AppendLine("    p { margin:0; color:var(--muted); }")
-    [void]$sb.AppendLine("    .topbar { position: sticky; top:0; z-index:10; padding:12px 0; backdrop-filter: blur(6px); background: color-mix(in srgb, var(--bg-top) 78%, transparent); border-bottom:1px solid var(--line); margin-bottom:18px; }")
-    [void]$sb.AppendLine("    .search { width:100%; border:1px solid var(--line); border-radius:10px; padding:10px 12px; font-size:0.95rem; background:var(--input-bg); color:var(--input-ink); }")
+    [void]$sb.AppendLine("    .wrap { width:min(1100px, 94vw); margin: 8px auto 24px; }")
+    [void]$sb.AppendLine("    h1 { margin:0 0 2px; font-size: clamp(1rem, 2vw, 1.4rem); }")
+    [void]$sb.AppendLine("    p { margin:0; color:var(--muted); font-size:0.85rem; }")
+    [void]$sb.AppendLine("    .topbar { position: sticky; top:0; z-index:10; padding:6px 0; backdrop-filter: blur(6px); background: color-mix(in srgb, var(--bg-top) 78%, transparent); border-bottom:1px solid var(--line); margin-bottom:8px; }")
+    [void]$sb.AppendLine("    .search { width:100%; border:1px solid var(--line); border-radius:10px; padding:6px 10px; font-size:0.9rem; background:var(--input-bg); color:var(--input-ink); }")
     [void]$sb.AppendLine("    .section { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:12px; margin-top:14px; box-shadow:0 8px 22px rgba(0,0,0,.28); }")
     [void]$sb.AppendLine("    .section h2 { margin:0 0 10px; color:var(--accent); font-size:1.05rem; letter-spacing:.2px; }")
     [void]$sb.AppendLine("    table { width:100%; border-collapse: collapse; font-size:0.9rem; }")
@@ -364,14 +390,15 @@ foreach ($rm in $rowMatches) {
 
     $s3 = Clean-Text $s3m.Groups["v"].Value
     $s4 = Clean-Text $s4m.Groups["v"].Value
+    $comboOverride = Get-ComboOverride -Eidolons $eidolons -Star3 $s3 -Star4 $s4
 
     $rows += [pscustomobject]@{
-        Category = Get-Category $s3
+        Category = $comboOverride.Category
         Eidolons = $eidolons
-        Star3 = $s3
-        Star4 = $s4
-        N3 = Get-Numeric $s3
-        N4 = Get-Numeric $s4
+        Star3 = $comboOverride.Star3
+        Star4 = $comboOverride.Star4
+        N3 = Get-Numeric $comboOverride.Star3
+        N4 = Get-Numeric $comboOverride.Star4
     }
 }
 
