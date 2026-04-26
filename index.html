@@ -9,7 +9,7 @@
     :root { --bg:#0f141d; --bg-top:#1a2230; --card:#161e2a; --ink:#e8edf5; --muted:#9aa8bc; --line:#2a3446; --accent:#7cc8ff; --th-bg:#1c2736; --chip-bg:#202b3b; --chip-line:#33455f; --icon-bg:#101722; --icon-line:#3a4d69; --input-bg:#121a26; --input-ink:#e8edf5; }
     body[data-theme='light'] { --bg:#fff6ef; --bg-top:#fffdf8; --card:#fffdf9; --ink:#2d1f1a; --muted:#6c5a53; --line:#efddd3; --accent:#cc5f2e; --th-bg:#fff4ec; --chip-bg:#fff7f1; --chip-line:#f0dfd5; --icon-bg:#ffffff; --icon-line:#e8d3c7; --input-bg:#ffffff; --input-ink:#2d1f1a; }
     * { box-sizing:border-box; }
-    body { margin:0; font-family: "Segoe UI", Tahoma, sans-serif; background: radial-gradient(circle at top, var(--bg-top), var(--bg)); color:var(--ink); }
+    html { background-color:#0f141d; } body { margin:0; font-family: "Segoe UI", Tahoma, sans-serif; background: radial-gradient(circle at top, var(--bg-top), var(--bg)); color:var(--ink); } body[data-theme='light'] { background-color:#fff6ef; }
     .wrap { width:min(1100px, 94vw); margin: 20px auto 48px; }
     h1 { margin:0 0 8px; font-size: clamp(1.4rem, 2.5vw, 2rem); }
     p { margin:0; color:var(--muted); }
@@ -34,7 +34,7 @@
     @media (max-width:760px) { .top-row { align-items:center; } }
   </style>
 </head>
-<body>
+<body style="background-color:#0f141d">
   <div class="topbar"><div class="wrap">
     <div class="top-row">
       <div>
@@ -509,6 +509,7 @@
     function applyTheme(theme) {
       const t = (theme === 'light') ? 'light' : 'dark';
       document.body.setAttribute('data-theme', t);
+      document.body.style.backgroundColor = (t === 'dark') ? '#0f141d' : '#fff6ef';
       themeIcon.textContent = (t === 'dark') ? '☀' : '☾';
       const actionLabel = (t === 'dark') ? 'Switch to light theme' : 'Switch to dark theme';
       themeToggle.setAttribute('aria-label', actionLabel);
