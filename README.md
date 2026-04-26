@@ -7,6 +7,10 @@ A lightweight Aura Kingdom Eidolon Archive app that:
 - opens as a desktop-like app window on Windows
 - can be hosted as a static website (for example, GitHub Pages)
 
+This project uses updated data from AuraKingdom-DB and is also inspired by the Eidolon Archive by Xilla:
+
+https://ak-eido-archive.carrd.co/
+
 ## Repository
 
 Official GitHub repository:

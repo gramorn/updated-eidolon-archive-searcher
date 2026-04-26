@@ -21,6 +21,24 @@ function Clean-Text {
     return ($clean -replace "\s+", " ").Trim()
 }
 
+function Normalize-EidolonName {
+    param([string]$Name)
+
+    if (-not $Name) {
+        return $Name
+    }
+
+    $map = @{
+        "H鐰ur" = "Hödur"
+    }
+
+    if ($map.ContainsKey($Name)) {
+        return $map[$Name]
+    }
+
+    return $Name
+}
+
 function Get-Category {
     param([string]$Star3)
 
@@ -54,7 +72,7 @@ function Get-Category {
     if ($s -match "^Ice attribute skill penetration effect") { return "ICE PEN EFFECT" }
     if ($s -match "^Holy attribute skill penetration effect") { return "HOLY PEN EFFECT" }
 
-    return "OUTROS"
+    return "OTHER"
 }
 
 function Get-Numeric {
@@ -130,7 +148,7 @@ function Build-PageHtml {
         "ICE PEN RESIST",
         "ICE PEN EFFECT",
         "HOLY PEN EFFECT",
-        "OUTROS"
+        "OTHER"
     )
 
     $groups = $Rows | Group-Object Category
@@ -270,12 +288,12 @@ $response = Invoke-WebRequest -Uri $Url -UseBasicParsing
 $html = $response.Content
 
 if (-not $html) {
-    throw "Nao foi possivel obter conteudo de $Url"
+    throw "Could not retrieve content from $Url"
 }
 
 $archiveMatch = [regex]::Match($html, "<table id=`"archive`"[\s\S]*?<tbody>(?<body>[\s\S]*?)</tbody>[\s\S]*?</table>")
 if (-not $archiveMatch.Success) {
-    throw "Tabela #archive nao encontrada no HTML baixado."
+    throw "Table #archive was not found in downloaded HTML."
 }
 
 $tbody = $archiveMatch.Groups["body"].Value
@@ -296,6 +314,7 @@ foreach ($rm in $rowMatches) {
     $eidolons = @()
     foreach ($em in $eidMatches) {
         $name = [System.Web.HttpUtility]::HtmlDecode($em.Groups["name"].Value).Trim()
+        $name = Normalize-EidolonName $name
         $src = $em.Groups["src"].Value.Trim()
         if ($name) {
             $eidolons += [pscustomobject]@{
@@ -329,7 +348,7 @@ foreach ($rm in $rowMatches) {
 }
 
 if ($rows.Count -eq 0) {
-    throw "Nenhuma linha de combo foi extraida da tabela #archive."
+    throw "No combo rows were extracted from table #archive."
 }
 
 $iconMap = @{}
@@ -366,8 +385,8 @@ Write-Host "[4/4] Saving file..."
 Set-Content -Path $OutputHtml -Value $page -Encoding UTF8
 
 Write-Host "Done."
-Write-Host ("Combos processados: " + $rows.Count)
-Write-Host ("Categorias: " + (($rows | Group-Object Category).Count))
+Write-Host ("Processed combos: " + $rows.Count)
+Write-Host ("Categories: " + (($rows | Group-Object Category).Count))
 if (-not $KeepRemoteIcons) {
     Write-Host ("Icons mapped locally: " + $iconMap.Count)
 }

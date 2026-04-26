@@ -1,6 +1,6 @@
 # EidolonApp.ps1 - Eidolon Archive Desktop Launcher
-# Abre o conteudo em modo de app (Edge), verifica atualizacoes em segundo plano,
-# notifica o usuario e atualiza se aceito.
+# Opens content in app mode (Edge), checks updates in background,
+# notifies the user, and updates when accepted.
 
 $ErrorActionPreference = "SilentlyContinue"
 
@@ -12,13 +12,13 @@ $TargetUrl   = "https://www.aurakingdom-db.com/charts/eidolon-archive"
 
 Add-Type -AssemblyName PresentationFramework
 
-# --- Versao local ---
+# --- Local version ---
 $localCount = 0
 if (Test-Path $VersionFile) {
     [int]::TryParse(((Get-Content $VersionFile -Raw -Encoding UTF8).Trim()), [ref]$localCount) | Out-Null
 }
 
-# --- Localizar Edge ---
+# --- Locate Edge ---
 $EdgeExe = @(
     "$env:ProgramFiles\Microsoft\Edge\Application\msedge.exe",
     "${env:ProgramFiles(x86)}\Microsoft\Edge\Application\msedge.exe",
@@ -27,7 +27,7 @@ $EdgeExe = @(
 
 $FileUri = "file:///" + $IndexFile.Replace('\', '/')
 
-# --- Abrir conteudo imediatamente ---
+# --- Open content immediately ---
 $edgeProc = $null
 if ($EdgeExe) {
     $edgeProc = Start-Process $EdgeExe -ArgumentList "--app=$FileUri", "--window-size=1280,820" -PassThru
@@ -35,7 +35,7 @@ if ($EdgeExe) {
     Start-Process $FileUri
 }
 
-# --- Verificar atualizacao em segundo plano ---
+# --- Check update in background ---
 $rs = [System.Management.Automation.Runspaces.RunspaceFactory]::CreateRunspace()
 $rs.ApartmentState = "STA"
 $rs.Open()
@@ -65,7 +65,7 @@ $ps.AddScript({
 
 $handle = $ps.BeginInvoke()
 
-# Aguardar resultado (maximo 12 segundos)
+# Wait for result (max 12 seconds)
 $waited = 0
 while (-not $handle.IsCompleted -and $waited -lt 12000) {
     [System.Threading.Thread]::Sleep(300)
@@ -73,7 +73,7 @@ while (-not $handle.IsCompleted -and $waited -lt 12000) {
 }
 
 if (-not $handle.IsCompleted) {
-    # Sem resposta - desistir silenciosamente
+    # No response - exit silently
     $ps.Dispose(); $rs.Dispose()
     exit 0
 }
@@ -81,9 +81,9 @@ if (-not $handle.IsCompleted) {
 $liveCount = [int]($ps.EndInvoke($handle) | Select-Object -First 1)
 $ps.Dispose(); $rs.Dispose()
 
-# --- Comparar versoes ---
-# liveCount = numero de <tr> no tbody do archive (= numero de combos na pagina online)
-# localCount = numero de combos salvo em version.txt apos ultimo update
+# --- Compare versions ---
+# liveCount = number of <tr> rows in archive tbody (= online combo count)
+# localCount = combo count saved in version.txt after last update
 if ($liveCount -gt 0 -and ($localCount -eq 0 -or $liveCount -gt $localCount)) {
 
     $msg = if ($localCount -eq 0) {
