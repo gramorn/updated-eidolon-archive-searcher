@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en" translate="no">
 <head>
   <meta charset="utf-8">
@@ -6,33 +6,44 @@
   <meta name="google" content="notranslate">
   <title>Eidolon Archive</title>
   <style>
-    :root { --bg:#fff6ef; --card:#fffdf9; --ink:#2d1f1a; --muted:#6c5a53; --line:#efddd3; --accent:#cc5f2e; }
+    :root { --bg:#0f141d; --bg-top:#1a2230; --card:#161e2a; --ink:#e8edf5; --muted:#9aa8bc; --line:#2a3446; --accent:#7cc8ff; --th-bg:#1c2736; --chip-bg:#202b3b; --chip-line:#33455f; --icon-bg:#101722; --icon-line:#3a4d69; --input-bg:#121a26; --input-ink:#e8edf5; }
+    body[data-theme='light'] { --bg:#fff6ef; --bg-top:#fffdf8; --card:#fffdf9; --ink:#2d1f1a; --muted:#6c5a53; --line:#efddd3; --accent:#cc5f2e; --th-bg:#fff4ec; --chip-bg:#fff7f1; --chip-line:#f0dfd5; --icon-bg:#ffffff; --icon-line:#e8d3c7; --input-bg:#ffffff; --input-ink:#2d1f1a; }
     * { box-sizing:border-box; }
-    body { margin:0; font-family: "Segoe UI", Tahoma, sans-serif; background: radial-gradient(circle at top, #fffdf8, var(--bg)); color:var(--ink); }
+    body { margin:0; font-family: "Segoe UI", Tahoma, sans-serif; background: radial-gradient(circle at top, var(--bg-top), var(--bg)); color:var(--ink); }
     .wrap { width:min(1100px, 94vw); margin: 20px auto 48px; }
     h1 { margin:0 0 8px; font-size: clamp(1.4rem, 2.5vw, 2rem); }
     p { margin:0; color:var(--muted); }
-    .topbar { position: sticky; top:0; z-index:10; padding:12px 0; backdrop-filter: blur(6px); background: color-mix(in srgb, #fffaf6 85%, transparent); border-bottom:1px solid var(--line); margin-bottom:18px; }
-    .search { width:100%; border:1px solid var(--line); border-radius:10px; padding:10px 12px; font-size:0.95rem; }
-    .section { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:12px; margin-top:14px; box-shadow:0 3px 10px rgba(0,0,0,.03); }
+    .topbar { position: sticky; top:0; z-index:10; padding:12px 0; backdrop-filter: blur(6px); background: color-mix(in srgb, var(--bg-top) 78%, transparent); border-bottom:1px solid var(--line); margin-bottom:18px; }
+    .search { width:100%; border:1px solid var(--line); border-radius:10px; padding:10px 12px; font-size:0.95rem; background:var(--input-bg); color:var(--input-ink); }
+    .section { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:12px; margin-top:14px; box-shadow:0 8px 22px rgba(0,0,0,.28); }
     .section h2 { margin:0 0 10px; color:var(--accent); font-size:1.05rem; letter-spacing:.2px; }
     table { width:100%; border-collapse: collapse; font-size:0.9rem; }
     th, td { border:1px solid var(--line); padding:8px; vertical-align:top; text-align:left; }
-    th { background:#fff4ec; }
+    th { background:var(--th-bg); }
     .totals { margin-top:8px; font-size:0.88rem; color:var(--muted); font-weight:600; }
     .hide { display:none !important; }
     .combo-list { display:flex; flex-wrap:wrap; align-items:center; gap:6px; }
-    .combo-item { display:inline-flex; align-items:center; gap:6px; background:#fff7f1; border:1px solid #f0dfd5; border-radius:999px; padding:3px 8px 3px 4px; }
-    .eido-icon { width:24px; height:24px; border-radius:50%; object-fit:cover; border:1px solid #e8d3c7; background:#fff; }
+    .combo-item { display:inline-flex; align-items:center; gap:6px; background:var(--chip-bg); border:1px solid var(--chip-line); border-radius:999px; padding:3px 8px 3px 4px; }
+    .eido-icon { width:24px; height:24px; border-radius:50%; object-fit:cover; border:1px solid var(--icon-line); background:var(--icon-bg); }
     .eido-missing { display:inline-flex; align-items:center; justify-content:center; font-size:12px; color:#8e6f61; }
-    .combo-sep { color:#9c8174; font-weight:700; }
+    .combo-sep { color:var(--muted); font-weight:700; }
+    .top-row { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:8px; }
+    .theme-toggle { width:40px; height:40px; border-radius:10px; border:1px solid var(--line); background:var(--card); color:var(--ink); display:inline-flex; align-items:center; justify-content:center; cursor:pointer; }
+    .theme-toggle:hover { border-color:var(--accent); }
+    .theme-icon { font-size:18px; line-height:1; }
+    @media (max-width:760px) { .top-row { align-items:center; } }
   </style>
 </head>
 <body>
   <div class="topbar"><div class="wrap">
-    <h1>Eidolon Archive</h1>
-    <p>Data automatically extracted from AuraKingdom-DB.</p>
-    <input id="q" class="search" placeholder="Search by Eidolon, combo or bonus...">
+    <div class="top-row">
+      <div>
+        <h1>Eidolon Archive</h1>
+        <p>Data automatically extracted from AuraKingdom-DB.</p>
+      </div>
+      <button id="themeToggle" class="theme-toggle" type="button" aria-label="Switch to light theme" title="Switch to light theme"><span id="themeIcon" class="theme-icon">☀</span></button>
+    </div>
+    <input id="q" class="search" placeholder="Search by Eidolon, combo or bonus..." title="Type to filter combos by Eidolon, combo, or bonus" aria-label="Search combos">
   </div></div>
   <main class="wrap">
     <section class='section' data-section='1'>
@@ -493,6 +504,22 @@
   </main>
   <script>
     const q = document.getElementById('q');
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = document.getElementById('themeIcon');
+    function applyTheme(theme) {
+      const t = (theme === 'light') ? 'light' : 'dark';
+      document.body.setAttribute('data-theme', t);
+      themeIcon.textContent = (t === 'dark') ? '☀' : '☾';
+      const actionLabel = (t === 'dark') ? 'Switch to light theme' : 'Switch to dark theme';
+      themeToggle.setAttribute('aria-label', actionLabel);
+      themeToggle.setAttribute('title', actionLabel);
+      localStorage.setItem('eidolonTheme', t);
+    }
+    applyTheme(localStorage.getItem('eidolonTheme') || 'dark');
+    themeToggle.addEventListener('click', () => {
+      const current = document.body.getAttribute('data-theme') || 'dark';
+      applyTheme(current === 'dark' ? 'light' : 'dark');
+    });
     q.addEventListener('input', () => {
       const term = q.value.toLowerCase().trim();
       document.querySelectorAll('section[data-section]').forEach(sec => {
