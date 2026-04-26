@@ -120,6 +120,13 @@ function Get-ComboOverride {
                 Star4 = "Max CRIT DMG +8%"
             }
         }
+        "bealdor|mary|pan" {
+            return [pscustomobject]@{
+                Category = "HOLY PEN EFFECT"
+                Star3 = "Holy attribute skill penetration effect +2%"
+                Star4 = "Holy attribute skill penetration effect +4%"
+            }
+        }
     }
 
     return [pscustomobject]@{
