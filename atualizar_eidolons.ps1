@@ -110,7 +110,25 @@ function Get-ComboOverride {
         [string]$Star4
     )
 
-    $comboKey = (($Eidolons | ForEach-Object { Normalize-Key $_.Name } | Sort-Object) -join "|")
+    $normalizedNames = @($Eidolons | ForEach-Object { Normalize-Key $_.Name })
+
+    # Source data bug: this combo can come with 3* Max CRIT DMG and 4* Main Weapon DMG.
+    # Force both tiers to Max CRIT DMG for the affected Christmas Little Red Riding Hood + Yarnaros + Christmas Andrea variant.
+    if (
+        ($normalizedNames -contains "christmaslittleredridinghood") -and
+        ($normalizedNames -contains "yarnaros") -and
+        ($normalizedNames -contains "christmasandrea") -and
+        ($Star3 -match "^Max CRIT DMG") -and
+        ($Star4 -match "^Main Weapon DMG")
+    ) {
+        return [pscustomobject]@{
+            Category = "MAX CRIT DMG"
+            Star3 = "Max CRIT DMG +2%"
+            Star4 = "Max CRIT DMG +4%"
+        }
+    }
+
+    $comboKey = (($normalizedNames | Sort-Object) -join "|")
 
     switch ($comboKey) {
         "faust|summerguanyu|summershutendoji" {
