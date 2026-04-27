@@ -1,0 +1,651 @@
+﻿[
+    {
+        "Name":  "Abraxas",
+        "Locations":  [
+                          "Gaia\u0027s Sanctuary (Solo / 5 Player) - Light Path",
+                          "Gaia\u0027s Sanctuary - Judgment (Solo / Party)",
+                          "Treasure chests found by using \u0027Archeology Maps\u0027"
+                      ]
+    },
+    {
+        "Name":  "Aelius",
+        "Locations":  [
+                          "Lv 25 Main Quest (Free Key of Gaia)",
+                          "Temple of Eidolons",
+                          "Otherworld: Port Skandia (All Modes)",
+                          "Otherworld: Helonia Coast (All Modes)",
+                          "Otherworld: Crescent Hill (All Modes)",
+                          "Gaia\u0027s Sanctuary (Solo / 5 Player) - Dark Path",
+                          "Gaia\u0027s Sanctuary - Judgment (Solo / Party) - Nightfall Path",
+                          "Guild Hall"
+                      ]
+    },
+    {
+        "Name":  "Alice",
+        "Locations":  [
+                          "Eidolon Gossip - Chapter 14",
+                          "Chronowood Cavern (Hell)",
+                          "Shattered Netherworld (Hell)",
+                          "Otherworld: Sarpa\u0027s Forbidden Lab (Party / Hell)",
+                          "Otherworld: Tomb of the Ancients (Party / Hell)"
+                      ]
+    },
+    {
+        "Name":  "Alucard",
+        "Locations":  [
+                          "Eidolon Gossip - Chapter 12",
+                          "Gaia\u0027s Sanctuary (Solo / 5 Player) - Dark Path"
+                      ]
+    },
+    {
+        "Name":  "Amaterasu",
+        "Locations":  [
+                          "Gaia\u0027s Sanctuary - Trial (Solo / Party) - Eternal Sun Path",
+                          "Sarpa\u0027s Forbidden Laboratory (Hell)",
+                          "Tomb of the Ancients (Hell)",
+                          "Otherworld: Twilight Forest (Party / Hell)"
+                      ]
+    },
+    {
+        "Name":  "Astraea",
+        "Locations":  [
+                          "Eidolon Gossip - Chapter 4",
+                          "Gaia\u0027s Sanctuary (Solo / 5 Player) - Light Path"
+                      ]
+    },
+    {
+        "Name":  "Ayako",
+        "Locations":  [
+                          "Gaia\u0027s Sanctuary - Judgment (Solo / Party) - Nightfall Path",
+                          "Chronowood Cavern (Hell)",
+                          "Shattered Netherworld (Hell)",
+                          "Otherworld: Sarpa\u0027s Forbidden Lab (Party / Hell)",
+                          "Otherworld: Tomb of the Ancients (Party / Hell)"
+                      ]
+    },
+    {
+        "Name":  "Bahadur",
+        "Locations":  [
+                          "Temple of Eidolons",
+                          "Otherworld: Port Skandia (All Modes)",
+                          "Otherworld: Helonia Coast (All Modes)",
+                          "Otherworld: Crescent Hill (All Modes)",
+                          "Gaia\u0027s Sanctuary (Solo / 5 Player) - Light Path",
+                          "Gaia\u0027s Sanctuary - Judgment (Solo / Party)",
+                          "Guild Hall",
+                          "Traveling Merchant: Trampling Thunder\u0027s Soul Box"
+                      ]
+    },
+    {
+        "Name":  "Bealdor",
+        "Locations":  [
+                          "Sky Tower F20",
+                          "Vault of Eternity - Chapter 7 (Party)"
+                      ]
+    },
+    {
+        "Name":  "Bel-Chandra",
+        "Locations":  [
+                          "Temple of Eidolons",
+                          "Otherworld: Port Skandia (All Modes)",
+                          "Otherworld: Helonia Coast (All Modes)",
+                          "Otherworld: Crescent Hill (All Modes)",
+                          "Gaia\u0027s Sanctuary (Solo / 5 Player) - Dark Path",
+                          "Gaia\u0027s Sanctuary - Trial (Solo / Party) - Eternal Sun Path",
+                          "Guild Hall",
+                          "Traveling Merchant: Empress of Torment\u0027s Soul Box"
+                      ]
+    },
+    {
+        "Name":  "Benkei",
+        "Locations":  [
+                          "Gaia\u0027s Sanctuary - Trial (Solo / Party) - Starry Night Path",
+                          "Gaia\u0027s Sanctuary - Judgment (Solo / Party) - Nightfall Path",
+                          "Daily Login (Free key fragments)"
+                      ]
+    },
+    {
+        "Name":  "Cerberus",
+        "Locations":  [
+                          "Infernal Abyss II"
+                      ]
+    },
+    {
+        "Name":  "Cesela",
+        "Locations":  [
+                          "Temple of the Eidolons",
+                          "Eidolon Gossip - Chapter 13",
+                          "Gaia\u0027s Sanctuary - Trial (Solo / Party) - Eternal Sun Path"
+                      ]
+    },
+    {
+        "Name":  "Cleopawtra",
+        "Locations":  [
+                          "Gaia\u0027s Sanctuary (Solo / 5 Player) - Light Path",
+                          "Gaia\u0027s Sanctuary - Judgement (Solo / Party)"
+                      ]
+    },
+    {
+        "Name":  "Cyril",
+        "Locations":  [
+                          "Gaia\u0027s Sanctuary (Solo / 5 Player) - Light Path",
+                          "Gaia\u0027s Sanctuary - Judgement (Solo / Party)",
+                          "Guild Instance (Dungeon completion reward)"
+                      ]
+    },
+    {
+        "Name":  "Dante",
+        "Locations":  [
+                          "Eidolon Gossip - Chapter 2",
+                          "Gaia\u0027s Sanctuary - Trial (Solo / Party) - Starry Night Path",
+                          "Tree Cave (Hell)",
+                          "Otherworld: Chronowood Cavern (Party / Hell)",
+                          "Otherworld: Shattered Netherworld (Party / Hell)",
+                          "Obscure Temple (Hell)",
+                          "Blood Lord\u0027s Daemonium"
+                      ]
+    },
+    {
+        "Name":  "Demeter",
+        "Locations":  [
+                          "Gaia\u0027s Sanctuary - Judgment (Solo / Party)",
+                          "Vault of Eternity - Chapter 2 (Party)",
+                          "Prison of the Jagged Bone (Hell Mode)",
+                          "Red Rock Blood Palace (Hell Mode)",
+                          "Hurricane Abyss II"
+                      ]
+    },
+    {
+        "Name":  "Eirene",
+        "Locations":  [
+                          "Eidolon Gossip - Chapter 6",
+                          "Vault of Eternity - Chapter 3 (Party)",
+                          "Prison of the Jagged Bone (Hell Mode)",
+                          "Red Rock Blood Palace (Hell Mode)"
+                      ]
+    },
+    {
+        "Name":  "Eligos",
+        "Locations":  [
+                          "Temple of Eidolons",
+                          "Otherworld: Port Skandia (All Modes)",
+                          "Otherworld: Helonia Coast (All Modes)",
+                          "Otherworld: Crescent Hill (All Modes)",
+                          "Gaia\u0027s Sanctuary (Solo / 5 Player) - Dark Path",
+                          "Gaia\u0027s Sanctuary - Trial (Solo / Party) - Starry Night Path",
+                          "Guild Hall",
+                          "Traveling Merchant: Duke of Darkness\u0027 Soul Box"
+                      ]
+    },
+    {
+        "Name":  "Endora",
+        "Locations":  [
+                          "Eidolon Gossip - Chapter 1",
+                          "Otherworld: Alabastren Temple (Party)",
+                          "Otherworld: Gydaie Glen (Party)",
+                          "Otherworld: Miner\u0027s Steppe (Party)",
+                          "Lament of the Thunder-Dragon King",
+                          "Landing of the Sky-Dragon King",
+                          "Siege of the Aqua-Dragon Queen",
+                          "Gaia\u0027s Sanctuary (Solo / 5 Player) - Dark Path"
+                      ]
+    },
+    {
+        "Name":  "Eternia",
+        "Locations":  [
+                          "Vault of Eternity (VOE Solo)",
+                          "Collect 50x \u0027Sands of Time\u0027 in Vault of Eternity and exchange for key fragments in Adventure Encyclopedia.",
+                          "A full key can be obtained in Port Skandia, trade \u0027Coin A\u0027 and \u0027Coin B\u0027 with Eternia."
+                      ]
+    },
+    {
+        "Name":  "Faust",
+        "Locations":  [
+                          "Gaia\u0027s Sanctuary - Trial (Solo / Party) - Starry Night Path",
+                          "Gaia Chronicles",
+                          "Collect 75x \u0027Faust Magic Crystal\u0027 in Gaia Chronicles to exchange for key fragments in Adventure Encyclopedia."
+                      ]
+    },
+    {
+        "Name":  "Ghodroon",
+        "Locations":  [
+                          "Avarice Abyss (All Modes)",
+                          "Gaia\u0027s Sanctuary - Trial (Solo / Party) - Eternal Sun Path",
+                          "Gaia\u0027s Sanctuary - Judgment (Solo / Party) - Nightfall Path"
+                      ]
+    },
+    {
+        "Name":  "Gigas",
+        "Locations":  [
+                          "Temple of Eidolons",
+                          "Lv 40 Main Quest (Free Key of Gaia)",
+                          "Otherworld: Port Skandia (All Modes)",
+                          "Otherworld: Helonia Coast (All Modes)",
+                          "Otherworld: Crescent Hill (All Modes)",
+                          "Gaia\u0027s Sanctuary (Solo / 5 Player) - Light Path",
+                          "Guild Hall"
+                      ]
+    },
+    {
+        "Name":  "Hades",
+        "Locations":  [
+                          "Eidolon Gossip - Chapter 9",
+                          "Gaia\u0027s Sanctuary - Judgment (Solo / Party) - Nightfall Path"
+                      ]
+    },
+    {
+        "Name":  "Harmonia",
+        "Locations":  [
+                          "Tree Cave (Hell)",
+                          "Otherworld: Chronowood Cavern (Party / Hell)",
+                          "Otherworld: Shattered Netherworld (Party / Hell)",
+                          "Obscure Temple (Hell)",
+                          "Blood Lord\u0027s Daemonium"
+                      ]
+    },
+    {
+        "Name":  "Hebe",
+        "Locations":  [
+                          "Eidolon Gossip - Chapter 7",
+                          "Endless Abyss (Hell Mode)",
+                          "Infernal Citadel (Hell Mode)",
+                          "Whirlpool Abyss II"
+                      ]
+    },
+    {
+        "Name":  "Hel",
+        "Locations":  [
+                          "Sky Tower F19",
+                          "Sky Realm F3 - Grief"
+                      ]
+    },
+    {
+        "Name":  "Hermes",
+        "Locations":  [
+                          "Vault of Eternity - Chapter 1 (Party)",
+                          "Thundering Abyss II"
+                      ]
+    },
+    {
+        "Name":  "Idun",
+        "Locations":  [
+                          "Sky Tower F50 Chest",
+                          "Gaia\u0027s Sanctuary - Judgment (Solo / 5 Player)"
+                      ]
+    },
+    {
+        "Name":  "Izanami",
+        "Locations":  [
+                          "Eidolon Gossip - Chapter 10",
+                          "Endless Abyss (Hell Mode)",
+                          "Infernal Citadel (Hell Mode)",
+                          "Avarice Abyss II"
+                      ]
+    },
+    {
+        "Name":  "Justicia",
+        "Locations":  [
+                          "Deer Valley (Hell Mode)",
+                          "Blue Valley Secret Realm (Hell Mode)",
+                          "Vault of Eternity - Chapter 11 (Party)"
+                      ]
+    },
+    {
+        "Name":  "Kaiser Zeta",
+        "Locations":  [
+                          "Titan\u0027s Root (Hell)",
+                          "Cadilla Felwood (Hell)",
+                          "Tempestrous Temple",
+                          "Pyroclastic Purgatory",
+                          "Otherworld: Deep\u0027s Cavern (Party)",
+                          "Otherworld: Candeo Core (Party)",
+                          "Gaia\u0027s Sanctuary (Solo / 5 Player) - Dark Path"
+                      ]
+    },
+    {
+        "Name":  "Kitami",
+        "Locations":  [
+                          "Eidolon Gossip - Chapter 5",
+                          "Gaia\u0027s Sanctuary - Judgment (Solo / Party)",
+                          "Swamp Forest (Hell)",
+                          "Frost Realm (Hell)",
+                          "Otherworld: Dawn Pathway (Party / Hell)",
+                          "Otherworld: Silent Dark Castle (Party / Hell)"
+                      ]
+    },
+    {
+        "Name":  "Kotonoha",
+        "Locations":  [
+                          "Temple of Eidolons",
+                          "Otherworld: Port Skandia (All Modes)",
+                          "Otherworld: Helonia Coast (All Modes)",
+                          "Otherworld: Crescent Hill (All Modes)",
+                          "Gaia\u0027s Sanctuary (Solo / 5 Player) - Light Path",
+                          "Gaia\u0027s Sanctuary - Trial (Solo / Party) - Eternal Sun Path",
+                          "Guild Hall"
+                      ]
+    },
+    {
+        "Name":  "Kusanagi",
+        "Locations":  [
+                          "Eidolon Gossip - Chapter 3",
+                          "Frozenlea Plains (Hell)",
+                          "Pyroclastic Purgatory",
+                          "Otherworld: Deep\u0027s Cavern (Hell)",
+                          "Otherworld: Candeo Core (Hell)",
+                          "Gaia\u0027s Sanctuary - Trial (Solo / Party) - Eternal Sun Path"
+                      ]
+    },
+    {
+        "Name":  "Lumikki",
+        "Locations":  [
+                          "Gaia\u0027s Sanctuary - Trial (Solo / Party) - Starry Night Path",
+                          "Hidden Crystals Cave (Hell)",
+                          "Ancestral Spirits Temple (Hell)",
+                          "Otherworld: Tree Cave (Party / Hell)",
+                          "Otherworld: Obscure Temple (Party / Hell)"
+                      ]
+    },
+    {
+        "Name":  "Maja",
+        "Locations":  [
+                          "Hall of Philae (All Chests)",
+                          "Gaia\u0027s Sanctuary - Trial (Solo / Party) - Eternal Sun Path",
+                          "Gaia\u0027s Sanctuary - Judgment (Solo / Party) - Nightfall Path",
+                          "Collect 720x \u0027Power of the Ancients\u0027 in Hall of Philae to exchange for key fragments in Adventure Encyclopedia"
+                      ]
+    },
+    {
+        "Name":  "Michaela",
+        "Locations":  [
+                          "Vault of Eternity - Chapter 8",
+                          "Secrets of Qingyan (Hell Mode)",
+                          "Gate of Abandoning God (Hell Mode)",
+                          "Abyss of Light II"
+                      ]
+    },
+    {
+        "Name":  "Muramasa",
+        "Locations":  [
+                          "Gaia\u0027s Sanctuary - Judgment (Solo / Party) - Nightfall Path",
+                          "Vault of Eternity - Chapter 9 (Party)"
+                      ]
+    },
+    {
+        "Name":  "Muse",
+        "Locations":  [
+                          "Eidolon Gossip - Chapter 17",
+                          "Dawn Passage (Hell)",
+                          "Silent Ancient Castle (Hell)",
+                          "Otherworld: Glacial Ice Cavern (Party / Hell)",
+                          "Otherworld: Subterranean Sanctuary (Party / Hell)",
+                          "Flowing Flame Forest",
+                          "Ancient War God\u0027s Brutality Crystal Vault"
+                      ]
+    },
+    {
+        "Name":  "Nalani",
+        "Locations":  [
+                          "Gaia\u0027s Sanctuary - Trial (Solo / Party) - Starry Night Path",
+                          "Gaia\u0027s Sanctuary - Judgment (Solo / Party) - Nightfall Path",
+                          "Abyss of Light (All Modes)"
+                      ]
+    },
+    {
+        "Name":  "Nazrudin",
+        "Locations":  [
+                          "Whirlpool Abyss (All Modes)",
+                          "Gaia\u0027s Sanctuary - Trial (Solo / Party) -Starry Night Path",
+                          "Gaia\u0027s Sanctuary - Judgment (Solo / Party) - Nightfall Path"
+                      ]
+    },
+    {
+        "Name":  "Nidhogg",
+        "Locations":  [
+                          "Eidolon Gossip - Chapter 16",
+                          "Gaia\u0027s Sanctuary - Judgment (Solo / 5 Player) - Nightfall Path"
+                      ]
+    },
+    {
+        "Name":  "Pandora",
+        "Locations":  [
+                          "Gaia\u0027s Sanctuary - Trial (Solo / Party) - Starry Night Path",
+                          "Swamp Forest (Hell)",
+                          "Frost Realm (Hell)",
+                          "Otherworld: Dawn Pathway (Party / Hell)",
+                          "Otherworld: Silent Dark Castle (Party / Hell)"
+                      ]
+    },
+    {
+        "Name":  "Quelkulan",
+        "Locations":  [
+                          "Temple of Eidolons",
+                          "Otherworld: Port Skandia (All Modes)",
+                          "Otherworld: Helonia Coast (All Modes)",
+                          "Otherworld: Crescent Hill (All Modes)",
+                          "Gaia\u0027s Sanctuary (Solo / 5 Player) - Dark Path",
+                          "Gaia\u0027s Sanctuary - Trial (Solo / Party) - Starry Night Path",
+                          "Thundering Abyss (All Modes)",
+                          "Guild Hall"
+                      ]
+    },
+    {
+        "Name":  "Santa Ayako",
+        "Locations":  [
+                          "Gaia\u0027s Sanctuary - Judgment (Solo / 5 Player)",
+                          "Vault of Eternity - Chapter 6 (Party)"
+                      ]
+    },
+    {
+        "Name":  "Santa Tyr",
+        "Locations":  [
+                          "Vault of Eternity - Chapter 5 (Party)"
+                      ]
+    },
+    {
+        "Name":  "Serena",
+        "Locations":  [
+                          "Wrathborne Temple (Hell)",
+                          "Ozymand Temple (Hell)",
+                          "Eidolon Gossip - Chapter 18",
+                          "Lament of the Thunder-Dragon King",
+                          "Landing of the Sky-Dragon King",
+                          "Siege of the Aqua-Dragon Queen",
+                          "Gaia\u0027s Sanctuary (Solo / 5 Player) - Dark Path"
+                      ]
+    },
+    {
+        "Name":  "Shirayuki",
+        "Locations":  [
+                          "Titan\u0027s Root (Hell)",
+                          "Cadilla Felwood (Hell)",
+                          "Tempestrous Temple",
+                          "Twilight Forest (Hell)",
+                          "Gaia\u0027s Sanctuary - Trial (Solo / Party) - Starry Night Path"
+                      ]
+    },
+    {
+        "Name":  "Sigrun",
+        "Locations":  [
+                          "Lv 25 Main Quest (Free Key of Gaia)",
+                          "Temple of Eidolons",
+                          "Otherworld: Port Skandia (All Modes)",
+                          "Otherworld: Helonia Coast (All Modes)",
+                          "Otherworld: Crescent Hill (All Modes)",
+                          "Gaia\u0027s Sanctuary (Solo / 5 Player) - Light Path",
+                          "Guild Hall"
+                      ]
+    },
+    {
+        "Name":  "Succubus",
+        "Locations":  [
+                          "Gaia\u0027s Sanctuary - Judgment (Solo / 5 Player) - Nightfall Path"
+                      ]
+    },
+    {
+        "Name":  "Tanith",
+        "Locations":  [
+                          "Sky Realm (All Chests)",
+                          "Gaia\u0027s Sanctuary - Trial (Solo / Party) - Starry Night Path",
+                          "Gaia\u0027s Sanctuary - Judgment (Solo / Party) - Nightfall Path",
+                          "Collect 100x \u0027Sky Realm Insignia\u0027 in Sky Realm to exchange for key fragments in Adventure Encyclopedia."
+                      ]
+    },
+    {
+        "Name":  "Tigerius Caesar",
+        "Locations":  [
+                          "Temple of Eidolons",
+                          "Otherworld: Port Skandia (All Modes)",
+                          "Otherworld: Helonia Coast (All Modes)",
+                          "Otherworld: Crescent Hill (All Modes)",
+                          "Gaia\u0027s Sanctuary (Solo / 5 Player) - Light Path",
+                          "Guild Hall",
+                          "Traveling Merchant: Feline Emperor\u0027s Soul Box"
+                      ]
+    },
+    {
+        "Name":  "Tsubaki",
+        "Locations":  [
+                          "Candeo Core (Hell)",
+                          "Deep\u0027s Cavern (Hell)",
+                          "Ghostweep Cave (Hell)",
+                          "Eidolon Gossip - Chapter 11",
+                          "Lament of the Thunder-Dragon King",
+                          "Landing of the Sky-Dragon King",
+                          "Siege of the Aqua-Dragon Queen",
+                          "Gaia\u0027s Sanctuary (Solo / 5 Player) - Light Path"
+                      ]
+    },
+    {
+        "Name":  "Tyr",
+        "Locations":  [
+                          "Gaia\u0027s Sanctuary - Judgment (Solo / Party) - Nightfall Path",
+                          "Hidden Crystals Cave (Hell)",
+                          "Ancestral Spirits Temple (Hell)",
+                          "Otherworld: Tree Cave (Party / Hell)",
+                          "Otherworld: Obscure Temple (Party / Hell)"
+                      ]
+    },
+    {
+        "Name":  "Undine",
+        "Locations":  [
+                          "Eidolon Gossip - Chapter 8",
+                          "Deer Valley (Hell Mode)",
+                          "Blue Valley Secret Realm (Hell Mode)"
+                      ]
+    },
+    {
+        "Name":  "Uriel",
+        "Locations":  [
+                          "Otherworld: Titan\u0027s Root (Party / Hell)",
+                          "Otherworld: Cadilla Felwood (Party / Hell)",
+                          "Gaia\u0027s Sanctuary - Trial (Solo / Party) - Eternal Sun Path",
+                          "Sarpa\u0027s Forbidden Laboratory (Hell)",
+                          "Tomb of the Ancients (Hell)"
+                      ]
+    },
+    {
+        "Name":  "Uzuriel",
+        "Locations":  [
+                          "Temple of Eidolons",
+                          "Lv 40 Main Quest (Free Key of Gaia)",
+                          "Otherworld: Port Skandia (All Modes)",
+                          "Otherworld: Helonia Coast (All Modes)",
+                          "Otherworld: Crescent Hill (All Modes)",
+                          "Gaia\u0027s Sanctuary (Solo / 5 Player) - Light Path",
+                          "Gaia\u0027s Sanctuary - Trial (Solo / Party) - Starry Night Path",
+                          "Guild Hall"
+                      ]
+    },
+    {
+        "Name":  "Vayu",
+        "Locations":  [
+                          "Temple of Eidolons",
+                          "Otherworld: Port Skandia (All Modes)",
+                          "Otherworld: Helonia Coast (All Modes)",
+                          "Otherworld: Crescent Hill (All Modes)",
+                          "Gaia\u0027s Sanctuary (Solo / 5 Player) - Dark Path",
+                          "Gaia\u0027s Sanctuary - Trial (Solo / Party) - Eternal Sun Path",
+                          "Guild Hall"
+                      ]
+    },
+    {
+        "Name":  "Venus",
+        "Locations":  [
+                          "Gaia\u0027s Sanctuary - Judgment (Solo / Party)",
+                          "Vault of Eternity - Chapter 4 (Party)",
+                          "Secrets of Qingyan (Hell Mode)",
+                          "Gate of Abandoning God (Hell Mode)"
+                      ]
+    },
+    {
+        "Name":  "Verdandi",
+        "Locations":  [
+                          "Sky Tower F50"
+                      ]
+    },
+    {
+        "Name":  "Vermilion",
+        "Locations":  [
+                          "Otherworld: Alabastren Temple (Hell)",
+                          "Otherworld: Gydaie Glen (Party)",
+                          "Otherworld: Miner\u0027s Steppe (Party)",
+                          "Lament of the Thunder-Dragon King",
+                          "Landing of the Sky-Dragon King",
+                          "Siege of the Aqua-Dragon Queen",
+                          "Gaia\u0027s Sanctuary (Solo / 5 Player) - Light Path"
+                      ]
+    },
+    {
+        "Name":  "Yarnaros",
+        "Locations":  [
+                          "Temple of Eidolons",
+                          "Otherworld: Port Skandia (All Modes)",
+                          "Otherworld: Helonia Coast (All Modes)",
+                          "Otherworld: Crescent Hill (All Modes)",
+                          "Gaia\u0027s Sanctuary (Solo / 5 Player) - Dark Path",
+                          "Gaia\u0027s Sanctuary - Judgment (Solo / Party)",
+                          "Hurricane Abyss (All Modes)",
+                          "Guild Hall",
+                          "Traveling Merchant: Emerald Tempest\u0027s Soul Box"
+                      ]
+    },
+    {
+        "Name":  "Yumikaze",
+        "Locations":  [
+                          "Eidolon Gossip - Chapter 15",
+                          "Gaia\u0027s Sanctuary - Trial (Solo / Party) - Starry Night Path",
+                          "Glacial Ice Cavern (Hell)",
+                          "Subterranean Sanctuary (Hell)",
+                          "Winged Duke\u0027s Domain"
+                      ]
+    },
+    {
+        "Name":  "Zaahir",
+        "Locations":  [
+                          "Infernal Abyss (All Modes)",
+                          "Gaia\u0027s Sanctuary (Solo / 5 Player) - Dark Path",
+                          "Gaia\u0027s Sanctuary - Judgment (Solo / Party)"
+                      ]
+    },
+    {
+        "Name":  "Zashi",
+        "Locations":  [
+                          "Gaia\u0027s Sanctuary - Judgment (Solo / Party)",
+                          "Dawn Passage (Hell)",
+                          "Silent Ancient Castle (Hell)",
+                          "Otherworld: Glacial Ice Cavern (Party / Hell)",
+                          "Otherworld: Subterranean Sanctuary (Party / Hell)",
+                          "Flowing Flame Forest",
+                          "Ancient War God\u0027s Brutality Crystal Vault"
+                      ]
+    },
+    {
+        "Name":  "Zephyrine",
+        "Locations":  [
+                          "Glacial Ice Cavern (Hell)",
+                          "Subterranean Sanctuary (Hell)",
+                          "Winged Duke\u0027s Domain"
+                      ]
+    }
+]

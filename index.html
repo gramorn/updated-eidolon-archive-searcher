@@ -35,7 +35,7 @@
     .info-menu-toggle::-webkit-details-marker { display:none; }
     .info-menu-panel { position:absolute; right:0; top:46px; width:min(340px, 90vw); padding:10px; border:1px solid var(--line); border-radius:12px; background:var(--card); box-shadow:0 14px 30px rgba(0,0,0,.35); display:none; z-index:25; }
     .info-menu[open] .info-menu-panel { display:grid; gap:8px; }
-    .info-menu-panel .lucky-pack-btn, .info-menu-panel .wish-coin-btn, .info-menu-panel .limit-break-btn { width:100%; justify-content:flex-start; }
+    .info-menu-panel .lucky-pack-btn, .info-menu-panel .wish-coin-btn, .info-menu-panel .limit-break-btn, .info-menu-panel .dungeon-guide-btn { width:100%; justify-content:flex-start; }
     .lucky-pack-btn { height:40px; border-radius:10px; border:1px solid var(--line); background:var(--card); display:inline-flex; align-items:center; justify-content:center; cursor:pointer; padding:0 10px; gap:6px; color:var(--ink); font-size:0.82rem; font-weight:600; }
     .lucky-pack-btn:hover { border-color:var(--accent); }
     .lucky-pack-icon { width:24px; height:24px; border-radius:6px; object-fit:cover; }
@@ -78,7 +78,26 @@
     .limit-break-actions { display:flex; justify-content:flex-end; margin-top:12px; }
     .limit-break-close { height:36px; border-radius:10px; border:1px solid var(--line); background:var(--card); color:var(--ink); cursor:pointer; padding:0 14px; }
     .limit-break-close:hover { border-color:var(--accent); }
-    @media (max-width:760px) { .top-row { align-items:stretch; flex-direction:column; } .top-actions { width:100%; justify-content:flex-start; } .lucky-pack-btn, .wish-coin-btn, .limit-break-btn { min-height:40px; padding:6px 10px; } .theme-toggle { flex:0 0 auto; } .info-menu-panel { position:static; width:100%; margin-top:8px; } th, td { padding:7px 6px; font-size:0.84rem; } }
+    .dungeon-guide-btn { height:40px; border-radius:10px; border:1px solid var(--line); background:var(--card); display:inline-flex; align-items:center; justify-content:center; cursor:pointer; padding:0 10px; gap:6px; color:var(--ink); font-size:0.82rem; font-weight:600; }
+    .dungeon-guide-btn:hover { border-color:var(--accent); }
+    .dungeon-guide-modal-backdrop { position:fixed; inset:0; background:rgba(3, 8, 18, 0.65); display:none; align-items:center; justify-content:center; z-index:80; padding:16px; }
+    .dungeon-guide-modal-backdrop.show { display:flex; }
+    .dungeon-guide-modal { width:min(920px, 96vw); max-height:90vh; overflow:auto; background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px; box-shadow:0 20px 48px rgba(0,0,0,.45); }
+    .dungeon-guide-modal h3 { margin:0 0 8px; font-size:1.02rem; color:var(--accent); }
+    .dungeon-guide-modal p { margin:0 0 10px; color:var(--muted); font-size:0.9rem; }
+    .dungeon-guide-modal p a { color:var(--accent); text-decoration:underline; text-underline-offset:2px; font-weight:600; }
+    .dungeon-guide-modal p a:hover { filter:brightness(1.12); }
+    .dungeon-guide-list { display:grid; grid-template-columns:repeat(auto-fit, minmax(230px, 1fr)); gap:10px; margin-top:10px; }
+    .dungeon-guide-item { border:1px solid var(--line); border-radius:10px; padding:8px; background:var(--chip-bg); }
+    .dungeon-guide-head { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
+    .dungeon-guide-icon { width:24px; height:24px; border-radius:50%; object-fit:cover; border:1px solid var(--icon-line); background:var(--icon-bg); flex:0 0 auto; }
+    .dungeon-guide-item h4 { margin:0 0 6px; font-size:0.9rem; color:var(--ink); }
+    .dungeon-guide-item ul { margin:0; padding-left:18px; }
+    .dungeon-guide-item li { margin:3px 0; color:var(--muted); font-size:0.82rem; }
+    .dungeon-guide-actions { display:flex; justify-content:flex-end; margin-top:12px; }
+    .dungeon-guide-close { height:36px; border-radius:10px; border:1px solid var(--line); background:var(--card); color:var(--ink); cursor:pointer; padding:0 14px; }
+    .dungeon-guide-close:hover { border-color:var(--accent); }
+    @media (max-width:760px) { .top-row { align-items:stretch; flex-direction:column; } .top-actions { width:100%; justify-content:flex-start; } .lucky-pack-btn, .wish-coin-btn, .limit-break-btn, .dungeon-guide-btn { min-height:40px; padding:6px 10px; } .theme-toggle { flex:0 0 auto; } .info-menu-panel { position:static; width:100%; margin-top:8px; } .dungeon-guide-list { grid-template-columns:1fr; } th, td { padding:7px 6px; font-size:0.84rem; } }
   </style>
 </head>
 <body style="background-color:#0f141d">
@@ -94,6 +113,7 @@
             <button id="luckyPackInfoBtn" class="lucky-pack-btn" type="button" title="What are Eidolon Lucky Packs?" aria-label="What are Eidolon Lucky Packs?">What is <img class="lucky-pack-icon" src="assets/icons/I80914.png" alt="Eidolon Lucky Pack">?</button>
             <button id="wishCoinInfoBtn" class="wish-coin-btn" type="button" title="What are Eidolon Wish Coins?" aria-label="What are Eidolon Wish Coins?">What is <img class="wish-coin-icon" src="assets/icons/I81010.png" alt="Eidolon Wish Coin">?</button>
             <button id="limitBreakInfoBtn" class="limit-break-btn" type="button" title="What are Card Breakthrough Devices?" aria-label="What are Card Breakthrough Devices?">What is <img class="limit-break-icon" src="assets/icons/I80781.png" alt="Card Breakthrough Device">?</button>
+            <button id="dungeonGuideInfoBtn" class="dungeon-guide-btn" type="button" title="Where can I find Eidolon spawn locations?" aria-label="Where can I find Eidolon spawn locations?">Eidolon Spawn Location</button>
           </div>
         </details>
         <button id="themeToggle" class="theme-toggle" type="button" aria-label="Switch to light theme" title="Switch to light theme"><span id="themeIcon" class="theme-icon">☀</span></button>
@@ -149,6 +169,869 @@
       </ul>
       <p>Prioritize reaching level 10 on cards with the strongest Status Bonuses for your build.</p>
       <div class="limit-break-actions"><button id="limitBreakCloseBtn" class="limit-break-close" type="button">Close</button></div>
+    </div>
+  </div>
+  <div id="dungeonGuideModal" class="dungeon-guide-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="dungeonGuideTitle">
+    <div class="dungeon-guide-modal">
+      <h3 id="dungeonGuideTitle">Eidolon Spawn Location</h3>
+      <p>Data provided by AngelicAse&#39;s spreadsheet: <a href="https://docs.google.com/spreadsheets/d/17pYlqk7__46yW7dDoClrQzK1hjJ85H7Hcvn0qYk7gHQ/edit?gid=0" target="_blank" rel="noopener noreferrer">Eidolon Spawn &amp; Key Fragment Locations</a>.</p>
+      <p><strong>Note:</strong> Eidolons not listed here may be obtained from the Loyalty Points shop, by buying from other players, through the Auction House, by playing Paragon, or from in-game events.</p>
+      <div class="dungeon-guide-list">
+        <div class='dungeon-guide-item'>
+          <div class='dungeon-guide-head'>
+            <img class='dungeon-guide-icon' src='assets/eidolons/P00007.png' alt='Abraxas' loading='lazy'>
+            <h4>Abraxas</h4>
+          </div>
+          <ul>
+            <li>Gaia&#39;s Sanctuary (Solo / 5 Player) - Light Path</li>
+            <li>Gaia&#39;s Sanctuary - Judgment (Solo / Party)</li>
+            <li>Treasure chests found by using &#39;Archeology Maps&#39;</li>
+          </ul>
+        </div>
+        <div class='dungeon-guide-item'>
+          <div class='dungeon-guide-head'>
+            <img class='dungeon-guide-icon' src='assets/eidolons/P00006.png' alt='Aelius' loading='lazy'>
+            <h4>Aelius</h4>
+          </div>
+          <ul>
+            <li>Lv 25 Main Quest (Free Key of Gaia)</li>
+            <li>Temple of Eidolons</li>
+            <li>Otherworld: Port Skandia (All Modes)</li>
+            <li>Otherworld: Helonia Coast (All Modes)</li>
+            <li>Otherworld: Crescent Hill (All Modes)</li>
+            <li>Gaia&#39;s Sanctuary (Solo / 5 Player) - Dark Path</li>
+            <li>Gaia&#39;s Sanctuary - Judgment (Solo / Party) - Nightfall Path</li>
+            <li>Guild Hall</li>
+          </ul>
+        </div>
+        <div class='dungeon-guide-item'>
+          <div class='dungeon-guide-head'>
+            <img class='dungeon-guide-icon' src='assets/eidolons/P00045.png' alt='Alice' loading='lazy'>
+            <h4>Alice</h4>
+          </div>
+          <ul>
+            <li>Eidolon Gossip - Chapter 14</li>
+            <li>Chronowood Cavern (Hell)</li>
+            <li>Shattered Netherworld (Hell)</li>
+            <li>Otherworld: Sarpa&#39;s Forbidden Lab (Party / Hell)</li>
+            <li>Otherworld: Tomb of the Ancients (Party / Hell)</li>
+          </ul>
+        </div>
+        <div class='dungeon-guide-item'>
+          <div class='dungeon-guide-head'>
+            <img class='dungeon-guide-icon' src='assets/eidolons/P00036.png' alt='Alucard' loading='lazy'>
+            <h4>Alucard</h4>
+          </div>
+          <ul>
+            <li>Eidolon Gossip - Chapter 12</li>
+            <li>Gaia&#39;s Sanctuary (Solo / 5 Player) - Dark Path</li>
+          </ul>
+        </div>
+        <div class='dungeon-guide-item'>
+          <div class='dungeon-guide-head'>
+            <img class='dungeon-guide-icon' src='assets/eidolons/P00044.png' alt='Amaterasu' loading='lazy'>
+            <h4>Amaterasu</h4>
+          </div>
+          <ul>
+            <li>Gaia&#39;s Sanctuary - Trial (Solo / Party) - Eternal Sun Path</li>
+            <li>Sarpa&#39;s Forbidden Laboratory (Hell)</li>
+            <li>Tomb of the Ancients (Hell)</li>
+            <li>Otherworld: Twilight Forest (Party / Hell)</li>
+          </ul>
+        </div>
+        <div class='dungeon-guide-item'>
+          <div class='dungeon-guide-head'>
+            <img class='dungeon-guide-icon' src='assets/eidolons/P00039.png' alt='Astraea' loading='lazy'>
+            <h4>Astraea</h4>
+          </div>
+          <ul>
+            <li>Eidolon Gossip - Chapter 4</li>
+            <li>Gaia&#39;s Sanctuary (Solo / 5 Player) - Light Path</li>
+          </ul>
+        </div>
+        <div class='dungeon-guide-item'>
+          <div class='dungeon-guide-head'>
+            <img class='dungeon-guide-icon' src='assets/eidolons/P00046.png' alt='Ayako' loading='lazy'>
+            <h4>Ayako</h4>
+          </div>
+          <ul>
+            <li>Gaia&#39;s Sanctuary - Judgment (Solo / Party) - Nightfall Path</li>
+            <li>Chronowood Cavern (Hell)</li>
+            <li>Shattered Netherworld (Hell)</li>
+            <li>Otherworld: Sarpa&#39;s Forbidden Lab (Party / Hell)</li>
+            <li>Otherworld: Tomb of the Ancients (Party / Hell)</li>
+          </ul>
+        </div>
+        <div class='dungeon-guide-item'>
+          <div class='dungeon-guide-head'>
+            <img class='dungeon-guide-icon' src='assets/eidolons/P00026.png' alt='Bahadur' loading='lazy'>
+            <h4>Bahadur</h4>
+          </div>
+          <ul>
+            <li>Temple of Eidolons</li>
+            <li>Otherworld: Port Skandia (All Modes)</li>
+            <li>Otherworld: Helonia Coast (All Modes)</li>
+            <li>Otherworld: Crescent Hill (All Modes)</li>
+            <li>Gaia&#39;s Sanctuary (Solo / 5 Player) - Light Path</li>
+            <li>Gaia&#39;s Sanctuary - Judgment (Solo / Party)</li>
+            <li>Guild Hall</li>
+            <li>Traveling Merchant: Trampling Thunder&#39;s Soul Box</li>
+          </ul>
+        </div>
+        <div class='dungeon-guide-item'>
+          <div class='dungeon-guide-head'>
+            <img class='dungeon-guide-icon' src='assets/eidolons/P00037.png' alt='Bealdor' loading='lazy'>
+            <h4>Bealdor</h4>
+          </div>
+          <ul>
+            <li>Sky Tower F20</li>
+            <li>Vault of Eternity - Chapter 7 (Party)</li>
+          </ul>
+        </div>
+        <div class='dungeon-guide-item'>
+          <div class='dungeon-guide-head'>
+            <img class='dungeon-guide-icon' src='assets/eidolons/P00016.png' alt='Bel-Chandra' loading='lazy'>
+            <h4>Bel-Chandra</h4>
+          </div>
+          <ul>
+            <li>Temple of Eidolons</li>
+            <li>Otherworld: Port Skandia (All Modes)</li>
+            <li>Otherworld: Helonia Coast (All Modes)</li>
+            <li>Otherworld: Crescent Hill (All Modes)</li>
+            <li>Gaia&#39;s Sanctuary (Solo / 5 Player) - Dark Path</li>
+            <li>Gaia&#39;s Sanctuary - Trial (Solo / Party) - Eternal Sun Path</li>
+            <li>Guild Hall</li>
+            <li>Traveling Merchant: Empress of Torment&#39;s Soul Box</li>
+          </ul>
+        </div>
+        <div class='dungeon-guide-item'>
+          <div class='dungeon-guide-head'>
+            <img class='dungeon-guide-icon' src='assets/eidolons/P00008.png' alt='Benkei' loading='lazy'>
+            <h4>Benkei</h4>
+          </div>
+          <ul>
+            <li>Gaia&#39;s Sanctuary - Trial (Solo / Party) - Starry Night Path</li>
+            <li>Gaia&#39;s Sanctuary - Judgment (Solo / Party) - Nightfall Path</li>
+            <li>Daily Login (Free key fragments)</li>
+          </ul>
+        </div>
+        <div class='dungeon-guide-item'>
+          <div class='dungeon-guide-head'>
+            <img class='dungeon-guide-icon' src='assets/eidolons/P00071.png' alt='Cerberus' loading='lazy'>
+            <h4>Cerberus</h4>
+          </div>
+          <ul>
+            <li>Infernal Abyss II</li>
+          </ul>
+        </div>
+        <div class='dungeon-guide-item'>
+          <div class='dungeon-guide-head'>
+            <img class='dungeon-guide-icon' src='assets/eidolons/P00041.png' alt='Cesela' loading='lazy'>
+            <h4>Cesela</h4>
+          </div>
+          <ul>
+            <li>Temple of the Eidolons</li>
+            <li>Eidolon Gossip - Chapter 13</li>
+            <li>Gaia&#39;s Sanctuary - Trial (Solo / Party) - Eternal Sun Path</li>
+          </ul>
+        </div>
+        <div class='dungeon-guide-item'>
+          <div class='dungeon-guide-head'>
+            <img class='dungeon-guide-icon' src='assets/eidolons/P00028.png' alt='Cleopawtra' loading='lazy'>
+            <h4>Cleopawtra</h4>
+          </div>
+          <ul>
+            <li>Gaia&#39;s Sanctuary (Solo / 5 Player) - Light Path</li>
+            <li>Gaia&#39;s Sanctuary - Judgement (Solo / Party)</li>
+          </ul>
+        </div>
+        <div class='dungeon-guide-item'>
+          <div class='dungeon-guide-head'>
+            <img class='dungeon-guide-icon' src='assets/eidolons/P00023.png' alt='Cyril' loading='lazy'>
+            <h4>Cyril</h4>
+          </div>
+          <ul>
+            <li>Gaia&#39;s Sanctuary (Solo / 5 Player) - Light Path</li>
+            <li>Gaia&#39;s Sanctuary - Judgement (Solo / Party)</li>
+            <li>Guild Instance (Dungeon completion reward)</li>
+          </ul>
+        </div>
+        <div class='dungeon-guide-item'>
+          <div class='dungeon-guide-head'>
+            <img class='dungeon-guide-icon' src='assets/eidolons/P00050.png' alt='Dante' loading='lazy'>
+            <h4>Dante</h4>
+          </div>
+          <ul>
+            <li>Eidolon Gossip - Chapter 2</li>
+            <li>Gaia&#39;s Sanctuary - Trial (Solo / Party) - Starry Night Path</li>
+            <li>Tree Cave (Hell)</li>
+            <li>Otherworld: Chronowood Cavern (Party / Hell)</li>
+            <li>Otherworld: Shattered Netherworld (Party / Hell)</li>
+            <li>Obscure Temple (Hell)</li>
+            <li>Blood Lord&#39;s Daemonium</li>
+          </ul>
+        </div>
+        <div class='dungeon-guide-item'>
+          <div class='dungeon-guide-head'>
+            <img class='dungeon-guide-icon' src='assets/eidolons/P00067.png' alt='Demeter' loading='lazy'>
+            <h4>Demeter</h4>
+          </div>
+          <ul>
+            <li>Gaia&#39;s Sanctuary - Judgment (Solo / Party)</li>
+            <li>Vault of Eternity - Chapter 2 (Party)</li>
+            <li>Prison of the Jagged Bone (Hell Mode)</li>
+            <li>Red Rock Blood Palace (Hell Mode)</li>
+            <li>Hurricane Abyss II</li>
+          </ul>
+        </div>
+        <div class='dungeon-guide-item'>
+          <div class='dungeon-guide-head'>
+            <img class='dungeon-guide-icon' src='assets/eidolons/P00066.png' alt='Eirene' loading='lazy'>
+            <h4>Eirene</h4>
+          </div>
+          <ul>
+            <li>Eidolon Gossip - Chapter 6</li>
+            <li>Vault of Eternity - Chapter 3 (Party)</li>
+            <li>Prison of the Jagged Bone (Hell Mode)</li>
+            <li>Red Rock Blood Palace (Hell Mode)</li>
+          </ul>
+        </div>
+        <div class='dungeon-guide-item'>
+          <div class='dungeon-guide-head'>
+            <img class='dungeon-guide-icon' src='assets/eidolons/P00010.png' alt='Eligos' loading='lazy'>
+            <h4>Eligos</h4>
+          </div>
+          <ul>
+            <li>Temple of Eidolons</li>
+            <li>Otherworld: Port Skandia (All Modes)</li>
+            <li>Otherworld: Helonia Coast (All Modes)</li>
+            <li>Otherworld: Crescent Hill (All Modes)</li>
+            <li>Gaia&#39;s Sanctuary (Solo / 5 Player) - Dark Path</li>
+            <li>Gaia&#39;s Sanctuary - Trial (Solo / Party) - Starry Night Path</li>
+            <li>Guild Hall</li>
+            <li>Traveling Merchant: Duke of Darkness&#39; Soul Box</li>
+          </ul>
+        </div>
+        <div class='dungeon-guide-item'>
+          <div class='dungeon-guide-head'>
+            <img class='dungeon-guide-icon' src='assets/eidolons/P00030.png' alt='Endora' loading='lazy'>
+            <h4>Endora</h4>
+          </div>
+          <ul>
+            <li>Eidolon Gossip - Chapter 1</li>
+            <li>Otherworld: Alabastren Temple (Party)</li>
+            <li>Otherworld: Gydaie Glen (Party)</li>
+            <li>Otherworld: Miner&#39;s Steppe (Party)</li>
+            <li>Lament of the Thunder-Dragon King</li>
+            <li>Landing of the Sky-Dragon King</li>
+            <li>Siege of the Aqua-Dragon Queen</li>
+            <li>Gaia&#39;s Sanctuary (Solo / 5 Player) - Dark Path</li>
+          </ul>
+        </div>
+        <div class='dungeon-guide-item'>
+          <div class='dungeon-guide-head'>
+            <img class='dungeon-guide-icon' src='assets/eidolons/P00047.png' alt='Eternia' loading='lazy'>
+            <h4>Eternia</h4>
+          </div>
+          <ul>
+            <li>Vault of Eternity (VOE Solo)</li>
+            <li>Collect 50x &#39;Sands of Time&#39; in Vault of Eternity and exchange for key fragments in Adventure Encyclopedia.</li>
+            <li>A full key can be obtained in Port Skandia, trade &#39;Coin A&#39; and &#39;Coin B&#39; with Eternia.</li>
+          </ul>
+        </div>
+        <div class='dungeon-guide-item'>
+          <div class='dungeon-guide-head'>
+            <img class='dungeon-guide-icon' src='assets/eidolons/P00009.png' alt='Faust' loading='lazy'>
+            <h4>Faust</h4>
+          </div>
+          <ul>
+            <li>Gaia&#39;s Sanctuary - Trial (Solo / Party) - Starry Night Path</li>
+            <li>Gaia Chronicles</li>
+            <li>Collect 75x &#39;Faust Magic Crystal&#39; in Gaia Chronicles to exchange for key fragments in Adventure Encyclopedia.</li>
+          </ul>
+        </div>
+        <div class='dungeon-guide-item'>
+          <div class='dungeon-guide-head'>
+            <img class='dungeon-guide-icon' src='assets/eidolons/P00020.png' alt='Ghodroon' loading='lazy'>
+            <h4>Ghodroon</h4>
+          </div>
+          <ul>
+            <li>Avarice Abyss (All Modes)</li>
+            <li>Gaia&#39;s Sanctuary - Trial (Solo / Party) - Eternal Sun Path</li>
+            <li>Gaia&#39;s Sanctuary - Judgment (Solo / Party) - Nightfall Path</li>
+          </ul>
+        </div>
+        <div class='dungeon-guide-item'>
+          <div class='dungeon-guide-head'>
+            <img class='dungeon-guide-icon' src='assets/eidolons/P00005.png' alt='Gigas' loading='lazy'>
+            <h4>Gigas</h4>
+          </div>
+          <ul>
+            <li>Temple of Eidolons</li>
+            <li>Lv 40 Main Quest (Free Key of Gaia)</li>
+            <li>Otherworld: Port Skandia (All Modes)</li>
+            <li>Otherworld: Helonia Coast (All Modes)</li>
+            <li>Otherworld: Crescent Hill (All Modes)</li>
+            <li>Gaia&#39;s Sanctuary (Solo / 5 Player) - Light Path</li>
+            <li>Guild Hall</li>
+          </ul>
+        </div>
+        <div class='dungeon-guide-item'>
+          <div class='dungeon-guide-head'>
+            <img class='dungeon-guide-icon' src='assets/eidolons/P00068.png' alt='Hades' loading='lazy'>
+            <h4>Hades</h4>
+          </div>
+          <ul>
+            <li>Eidolon Gossip - Chapter 9</li>
+            <li>Gaia&#39;s Sanctuary - Judgment (Solo / Party) - Nightfall Path</li>
+          </ul>
+        </div>
+        <div class='dungeon-guide-item'>
+          <div class='dungeon-guide-head'>
+            <img class='dungeon-guide-icon' src='assets/eidolons/P00051.png' alt='Harmonia' loading='lazy'>
+            <h4>Harmonia</h4>
+          </div>
+          <ul>
+            <li>Tree Cave (Hell)</li>
+            <li>Otherworld: Chronowood Cavern (Party / Hell)</li>
+            <li>Otherworld: Shattered Netherworld (Party / Hell)</li>
+            <li>Obscure Temple (Hell)</li>
+            <li>Blood Lord&#39;s Daemonium</li>
+          </ul>
+        </div>
+        <div class='dungeon-guide-item'>
+          <div class='dungeon-guide-head'>
+            <img class='dungeon-guide-icon' src='assets/eidolons/P00065.png' alt='Hebe' loading='lazy'>
+            <h4>Hebe</h4>
+          </div>
+          <ul>
+            <li>Eidolon Gossip - Chapter 7</li>
+            <li>Endless Abyss (Hell Mode)</li>
+            <li>Infernal Citadel (Hell Mode)</li>
+            <li>Whirlpool Abyss II</li>
+          </ul>
+        </div>
+        <div class='dungeon-guide-item'>
+          <div class='dungeon-guide-head'>
+            <img class='dungeon-guide-icon' src='assets/eidolons/P00035.png' alt='Hel' loading='lazy'>
+            <h4>Hel</h4>
+          </div>
+          <ul>
+            <li>Sky Tower F19</li>
+            <li>Sky Realm F3 - Grief</li>
+          </ul>
+        </div>
+        <div class='dungeon-guide-item'>
+          <div class='dungeon-guide-head'>
+            <img class='dungeon-guide-icon' src='assets/eidolons/P00069.png' alt='Hermes' loading='lazy'>
+            <h4>Hermes</h4>
+          </div>
+          <ul>
+            <li>Vault of Eternity - Chapter 1 (Party)</li>
+            <li>Thundering Abyss II</li>
+          </ul>
+        </div>
+        <div class='dungeon-guide-item'>
+          <div class='dungeon-guide-head'>
+            <img class='dungeon-guide-icon' src='assets/eidolons/P00072.png' alt='Idun' loading='lazy'>
+            <h4>Idun</h4>
+          </div>
+          <ul>
+            <li>Sky Tower F50 Chest</li>
+            <li>Gaia&#39;s Sanctuary - Judgment (Solo / 5 Player)</li>
+          </ul>
+        </div>
+        <div class='dungeon-guide-item'>
+          <div class='dungeon-guide-head'>
+            <img class='dungeon-guide-icon' src='assets/eidolons/P00064.png' alt='Izanami' loading='lazy'>
+            <h4>Izanami</h4>
+          </div>
+          <ul>
+            <li>Eidolon Gossip - Chapter 10</li>
+            <li>Endless Abyss (Hell Mode)</li>
+            <li>Infernal Citadel (Hell Mode)</li>
+            <li>Avarice Abyss II</li>
+          </ul>
+        </div>
+        <div class='dungeon-guide-item'>
+          <div class='dungeon-guide-head'>
+            <img class='dungeon-guide-icon' src='assets/eidolons/P00060.png' alt='Justicia' loading='lazy'>
+            <h4>Justicia</h4>
+          </div>
+          <ul>
+            <li>Deer Valley (Hell Mode)</li>
+            <li>Blue Valley Secret Realm (Hell Mode)</li>
+            <li>Vault of Eternity - Chapter 11 (Party)</li>
+          </ul>
+        </div>
+        <div class='dungeon-guide-item'>
+          <div class='dungeon-guide-head'>
+            <img class='dungeon-guide-icon' src='assets/eidolons/P00034.png' alt='Kaiser Zeta' loading='lazy'>
+            <h4>Kaiser Zeta</h4>
+          </div>
+          <ul>
+            <li>Titan&#39;s Root (Hell)</li>
+            <li>Cadilla Felwood (Hell)</li>
+            <li>Tempestrous Temple</li>
+            <li>Pyroclastic Purgatory</li>
+            <li>Otherworld: Deep&#39;s Cavern (Party)</li>
+            <li>Otherworld: Candeo Core (Party)</li>
+            <li>Gaia&#39;s Sanctuary (Solo / 5 Player) - Dark Path</li>
+          </ul>
+        </div>
+        <div class='dungeon-guide-item'>
+          <div class='dungeon-guide-head'>
+            <img class='dungeon-guide-icon' src='assets/eidolons/P00057.png' alt='Kitami' loading='lazy'>
+            <h4>Kitami</h4>
+          </div>
+          <ul>
+            <li>Eidolon Gossip - Chapter 5</li>
+            <li>Gaia&#39;s Sanctuary - Judgment (Solo / Party)</li>
+            <li>Swamp Forest (Hell)</li>
+            <li>Frost Realm (Hell)</li>
+            <li>Otherworld: Dawn Pathway (Party / Hell)</li>
+            <li>Otherworld: Silent Dark Castle (Party / Hell)</li>
+          </ul>
+        </div>
+        <div class='dungeon-guide-item'>
+          <div class='dungeon-guide-head'>
+            <img class='dungeon-guide-icon' src='assets/eidolons/P00024.png' alt='Kotonoha' loading='lazy'>
+            <h4>Kotonoha</h4>
+          </div>
+          <ul>
+            <li>Temple of Eidolons</li>
+            <li>Otherworld: Port Skandia (All Modes)</li>
+            <li>Otherworld: Helonia Coast (All Modes)</li>
+            <li>Otherworld: Crescent Hill (All Modes)</li>
+            <li>Gaia&#39;s Sanctuary (Solo / 5 Player) - Light Path</li>
+            <li>Gaia&#39;s Sanctuary - Trial (Solo / Party) - Eternal Sun Path</li>
+            <li>Guild Hall</li>
+          </ul>
+        </div>
+        <div class='dungeon-guide-item'>
+          <div class='dungeon-guide-head'>
+            <img class='dungeon-guide-icon' src='assets/eidolons/P00038.png' alt='Kusanagi' loading='lazy'>
+            <h4>Kusanagi</h4>
+          </div>
+          <ul>
+            <li>Eidolon Gossip - Chapter 3</li>
+            <li>Frozenlea Plains (Hell)</li>
+            <li>Pyroclastic Purgatory</li>
+            <li>Otherworld: Deep&#39;s Cavern (Hell)</li>
+            <li>Otherworld: Candeo Core (Hell)</li>
+            <li>Gaia&#39;s Sanctuary - Trial (Solo / Party) - Eternal Sun Path</li>
+          </ul>
+        </div>
+        <div class='dungeon-guide-item'>
+          <div class='dungeon-guide-head'>
+            <img class='dungeon-guide-icon' src='assets/eidolons/P00054.png' alt='Lumikki' loading='lazy'>
+            <h4>Lumikki</h4>
+          </div>
+          <ul>
+            <li>Gaia&#39;s Sanctuary - Trial (Solo / Party) - Starry Night Path</li>
+            <li>Hidden Crystals Cave (Hell)</li>
+            <li>Ancestral Spirits Temple (Hell)</li>
+            <li>Otherworld: Tree Cave (Party / Hell)</li>
+            <li>Otherworld: Obscure Temple (Party / Hell)</li>
+          </ul>
+        </div>
+        <div class='dungeon-guide-item'>
+          <div class='dungeon-guide-head'>
+            <img class='dungeon-guide-icon' src='assets/eidolons/P00015.png' alt='Maja' loading='lazy'>
+            <h4>Maja</h4>
+          </div>
+          <ul>
+            <li>Hall of Philae (All Chests)</li>
+            <li>Gaia&#39;s Sanctuary - Trial (Solo / Party) - Eternal Sun Path</li>
+            <li>Gaia&#39;s Sanctuary - Judgment (Solo / Party) - Nightfall Path</li>
+            <li>Collect 720x &#39;Power of the Ancients&#39; in Hall of Philae to exchange for key fragments in Adventure Encyclopedia</li>
+          </ul>
+        </div>
+        <div class='dungeon-guide-item'>
+          <div class='dungeon-guide-head'>
+            <img class='dungeon-guide-icon' src='assets/eidolons/P00061.png' alt='Michaela' loading='lazy'>
+            <h4>Michaela</h4>
+          </div>
+          <ul>
+            <li>Vault of Eternity - Chapter 8</li>
+            <li>Secrets of Qingyan (Hell Mode)</li>
+            <li>Gate of Abandoning God (Hell Mode)</li>
+            <li>Abyss of Light II</li>
+          </ul>
+        </div>
+        <div class='dungeon-guide-item'>
+          <div class='dungeon-guide-head'>
+            <img class='dungeon-guide-icon' src='assets/eidolons/P00062.png' alt='Muramasa' loading='lazy'>
+            <h4>Muramasa</h4>
+          </div>
+          <ul>
+            <li>Gaia&#39;s Sanctuary - Judgment (Solo / Party) - Nightfall Path</li>
+            <li>Vault of Eternity - Chapter 9 (Party)</li>
+          </ul>
+        </div>
+        <div class='dungeon-guide-item'>
+          <div class='dungeon-guide-head'>
+            <img class='dungeon-guide-icon' src='assets/eidolons/P00053.png' alt='Muse' loading='lazy'>
+            <h4>Muse</h4>
+          </div>
+          <ul>
+            <li>Eidolon Gossip - Chapter 17</li>
+            <li>Dawn Passage (Hell)</li>
+            <li>Silent Ancient Castle (Hell)</li>
+            <li>Otherworld: Glacial Ice Cavern (Party / Hell)</li>
+            <li>Otherworld: Subterranean Sanctuary (Party / Hell)</li>
+            <li>Flowing Flame Forest</li>
+            <li>Ancient War God&#39;s Brutality Crystal Vault</li>
+          </ul>
+        </div>
+        <div class='dungeon-guide-item'>
+          <div class='dungeon-guide-head'>
+            <img class='dungeon-guide-icon' src='assets/eidolons/P00012.png' alt='Nalani' loading='lazy'>
+            <h4>Nalani</h4>
+          </div>
+          <ul>
+            <li>Gaia&#39;s Sanctuary - Trial (Solo / Party) - Starry Night Path</li>
+            <li>Gaia&#39;s Sanctuary - Judgment (Solo / Party) - Nightfall Path</li>
+            <li>Abyss of Light (All Modes)</li>
+          </ul>
+        </div>
+        <div class='dungeon-guide-item'>
+          <div class='dungeon-guide-head'>
+            <img class='dungeon-guide-icon' src='assets/eidolons/P00018.png' alt='Nazrudin' loading='lazy'>
+            <h4>Nazrudin</h4>
+          </div>
+          <ul>
+            <li>Whirlpool Abyss (All Modes)</li>
+            <li>Gaia&#39;s Sanctuary - Trial (Solo / Party) -Starry Night Path</li>
+            <li>Gaia&#39;s Sanctuary - Judgment (Solo / Party) - Nightfall Path</li>
+          </ul>
+        </div>
+        <div class='dungeon-guide-item'>
+          <div class='dungeon-guide-head'>
+            <img class='dungeon-guide-icon' src='assets/eidolons/P00073.png' alt='Nidhogg' loading='lazy'>
+            <h4>Nidhogg</h4>
+          </div>
+          <ul>
+            <li>Eidolon Gossip - Chapter 16</li>
+            <li>Gaia&#39;s Sanctuary - Judgment (Solo / 5 Player) - Nightfall Path</li>
+          </ul>
+        </div>
+        <div class='dungeon-guide-item'>
+          <div class='dungeon-guide-head'>
+            <img class='dungeon-guide-icon' src='assets/eidolons/P00056.png' alt='Pandora' loading='lazy'>
+            <h4>Pandora</h4>
+          </div>
+          <ul>
+            <li>Gaia&#39;s Sanctuary - Trial (Solo / Party) - Starry Night Path</li>
+            <li>Swamp Forest (Hell)</li>
+            <li>Frost Realm (Hell)</li>
+            <li>Otherworld: Dawn Pathway (Party / Hell)</li>
+            <li>Otherworld: Silent Dark Castle (Party / Hell)</li>
+          </ul>
+        </div>
+        <div class='dungeon-guide-item'>
+          <div class='dungeon-guide-head'>
+            <img class='dungeon-guide-icon' src='assets/eidolons/P00021.png' alt='Quelkulan' loading='lazy'>
+            <h4>Quelkulan</h4>
+          </div>
+          <ul>
+            <li>Temple of Eidolons</li>
+            <li>Otherworld: Port Skandia (All Modes)</li>
+            <li>Otherworld: Helonia Coast (All Modes)</li>
+            <li>Otherworld: Crescent Hill (All Modes)</li>
+            <li>Gaia&#39;s Sanctuary (Solo / 5 Player) - Dark Path</li>
+            <li>Gaia&#39;s Sanctuary - Trial (Solo / Party) - Starry Night Path</li>
+            <li>Thundering Abyss (All Modes)</li>
+            <li>Guild Hall</li>
+          </ul>
+        </div>
+        <div class='dungeon-guide-item'>
+          <div class='dungeon-guide-head'>
+            <img class='dungeon-guide-icon' src='assets/eidolons/P00075.png' alt='Santa Ayako' loading='lazy'>
+            <h4>Santa Ayako</h4>
+          </div>
+          <ul>
+            <li>Gaia&#39;s Sanctuary - Judgment (Solo / 5 Player)</li>
+            <li>Vault of Eternity - Chapter 6 (Party)</li>
+          </ul>
+        </div>
+        <div class='dungeon-guide-item'>
+          <div class='dungeon-guide-head'>
+            <img class='dungeon-guide-icon' src='assets/eidolons/P00074.png' alt='Santa Tyr' loading='lazy'>
+            <h4>Santa Tyr</h4>
+          </div>
+          <ul>
+            <li>Vault of Eternity - Chapter 5 (Party)</li>
+          </ul>
+        </div>
+        <div class='dungeon-guide-item'>
+          <div class='dungeon-guide-head'>
+            <img class='dungeon-guide-icon' src='assets/eidolons/P00029.png' alt='Serena' loading='lazy'>
+            <h4>Serena</h4>
+          </div>
+          <ul>
+            <li>Wrathborne Temple (Hell)</li>
+            <li>Ozymand Temple (Hell)</li>
+            <li>Eidolon Gossip - Chapter 18</li>
+            <li>Lament of the Thunder-Dragon King</li>
+            <li>Landing of the Sky-Dragon King</li>
+            <li>Siege of the Aqua-Dragon Queen</li>
+            <li>Gaia&#39;s Sanctuary (Solo / 5 Player) - Dark Path</li>
+          </ul>
+        </div>
+        <div class='dungeon-guide-item'>
+          <div class='dungeon-guide-head'>
+            <img class='dungeon-guide-icon' src='assets/eidolons/P00032.png' alt='Shirayuki' loading='lazy'>
+            <h4>Shirayuki</h4>
+          </div>
+          <ul>
+            <li>Titan&#39;s Root (Hell)</li>
+            <li>Cadilla Felwood (Hell)</li>
+            <li>Tempestrous Temple</li>
+            <li>Twilight Forest (Hell)</li>
+            <li>Gaia&#39;s Sanctuary - Trial (Solo / Party) - Starry Night Path</li>
+          </ul>
+        </div>
+        <div class='dungeon-guide-item'>
+          <div class='dungeon-guide-head'>
+            <img class='dungeon-guide-icon' src='assets/eidolons/P00011.png' alt='Sigrun' loading='lazy'>
+            <h4>Sigrun</h4>
+          </div>
+          <ul>
+            <li>Lv 25 Main Quest (Free Key of Gaia)</li>
+            <li>Temple of Eidolons</li>
+            <li>Otherworld: Port Skandia (All Modes)</li>
+            <li>Otherworld: Helonia Coast (All Modes)</li>
+            <li>Otherworld: Crescent Hill (All Modes)</li>
+            <li>Gaia&#39;s Sanctuary (Solo / 5 Player) - Light Path</li>
+            <li>Guild Hall</li>
+          </ul>
+        </div>
+        <div class='dungeon-guide-item'>
+          <div class='dungeon-guide-head'>
+            <img class='dungeon-guide-icon' src='assets/eidolons/P00070.png' alt='Succubus' loading='lazy'>
+            <h4>Succubus</h4>
+          </div>
+          <ul>
+            <li>Gaia&#39;s Sanctuary - Judgment (Solo / 5 Player) - Nightfall Path</li>
+          </ul>
+        </div>
+        <div class='dungeon-guide-item'>
+          <div class='dungeon-guide-head'>
+            <img class='dungeon-guide-icon' src='assets/eidolons/P00014.png' alt='Tanith' loading='lazy'>
+            <h4>Tanith</h4>
+          </div>
+          <ul>
+            <li>Sky Realm (All Chests)</li>
+            <li>Gaia&#39;s Sanctuary - Trial (Solo / Party) - Starry Night Path</li>
+            <li>Gaia&#39;s Sanctuary - Judgment (Solo / Party) - Nightfall Path</li>
+            <li>Collect 100x &#39;Sky Realm Insignia&#39; in Sky Realm to exchange for key fragments in Adventure Encyclopedia.</li>
+          </ul>
+        </div>
+        <div class='dungeon-guide-item'>
+          <div class='dungeon-guide-head'>
+            <img class='dungeon-guide-icon' src='assets/eidolons/P00025.png' alt='Tigerius Caesar' loading='lazy'>
+            <h4>Tigerius Caesar</h4>
+          </div>
+          <ul>
+            <li>Temple of Eidolons</li>
+            <li>Otherworld: Port Skandia (All Modes)</li>
+            <li>Otherworld: Helonia Coast (All Modes)</li>
+            <li>Otherworld: Crescent Hill (All Modes)</li>
+            <li>Gaia&#39;s Sanctuary (Solo / 5 Player) - Light Path</li>
+            <li>Guild Hall</li>
+            <li>Traveling Merchant: Feline Emperor&#39;s Soul Box</li>
+          </ul>
+        </div>
+        <div class='dungeon-guide-item'>
+          <div class='dungeon-guide-head'>
+            <img class='dungeon-guide-icon' src='assets/eidolons/P00027.png' alt='Tsubaki' loading='lazy'>
+            <h4>Tsubaki</h4>
+          </div>
+          <ul>
+            <li>Candeo Core (Hell)</li>
+            <li>Deep&#39;s Cavern (Hell)</li>
+            <li>Ghostweep Cave (Hell)</li>
+            <li>Eidolon Gossip - Chapter 11</li>
+            <li>Lament of the Thunder-Dragon King</li>
+            <li>Landing of the Sky-Dragon King</li>
+            <li>Siege of the Aqua-Dragon Queen</li>
+            <li>Gaia&#39;s Sanctuary (Solo / 5 Player) - Light Path</li>
+          </ul>
+        </div>
+        <div class='dungeon-guide-item'>
+          <div class='dungeon-guide-head'>
+            <img class='dungeon-guide-icon' src='assets/eidolons/P00055.png' alt='Tyr' loading='lazy'>
+            <h4>Tyr</h4>
+          </div>
+          <ul>
+            <li>Gaia&#39;s Sanctuary - Judgment (Solo / Party) - Nightfall Path</li>
+            <li>Hidden Crystals Cave (Hell)</li>
+            <li>Ancestral Spirits Temple (Hell)</li>
+            <li>Otherworld: Tree Cave (Party / Hell)</li>
+            <li>Otherworld: Obscure Temple (Party / Hell)</li>
+          </ul>
+        </div>
+        <div class='dungeon-guide-item'>
+          <div class='dungeon-guide-head'>
+            <img class='dungeon-guide-icon' src='assets/eidolons/P00058.png' alt='Undine' loading='lazy'>
+            <h4>Undine</h4>
+          </div>
+          <ul>
+            <li>Eidolon Gossip - Chapter 8</li>
+            <li>Deer Valley (Hell Mode)</li>
+            <li>Blue Valley Secret Realm (Hell Mode)</li>
+          </ul>
+        </div>
+        <div class='dungeon-guide-item'>
+          <div class='dungeon-guide-head'>
+            <img class='dungeon-guide-icon' src='assets/eidolons/P00043.png' alt='Uriel' loading='lazy'>
+            <h4>Uriel</h4>
+          </div>
+          <ul>
+            <li>Otherworld: Titan&#39;s Root (Party / Hell)</li>
+            <li>Otherworld: Cadilla Felwood (Party / Hell)</li>
+            <li>Gaia&#39;s Sanctuary - Trial (Solo / Party) - Eternal Sun Path</li>
+            <li>Sarpa&#39;s Forbidden Laboratory (Hell)</li>
+            <li>Tomb of the Ancients (Hell)</li>
+          </ul>
+        </div>
+        <div class='dungeon-guide-item'>
+          <div class='dungeon-guide-head'>
+            <img class='dungeon-guide-icon' src='assets/eidolons/P00013.png' alt='Uzuriel' loading='lazy'>
+            <h4>Uzuriel</h4>
+          </div>
+          <ul>
+            <li>Temple of Eidolons</li>
+            <li>Lv 40 Main Quest (Free Key of Gaia)</li>
+            <li>Otherworld: Port Skandia (All Modes)</li>
+            <li>Otherworld: Helonia Coast (All Modes)</li>
+            <li>Otherworld: Crescent Hill (All Modes)</li>
+            <li>Gaia&#39;s Sanctuary (Solo / 5 Player) - Light Path</li>
+            <li>Gaia&#39;s Sanctuary - Trial (Solo / Party) - Starry Night Path</li>
+            <li>Guild Hall</li>
+          </ul>
+        </div>
+        <div class='dungeon-guide-item'>
+          <div class='dungeon-guide-head'>
+            <img class='dungeon-guide-icon' src='assets/eidolons/P00017.png' alt='Vayu' loading='lazy'>
+            <h4>Vayu</h4>
+          </div>
+          <ul>
+            <li>Temple of Eidolons</li>
+            <li>Otherworld: Port Skandia (All Modes)</li>
+            <li>Otherworld: Helonia Coast (All Modes)</li>
+            <li>Otherworld: Crescent Hill (All Modes)</li>
+            <li>Gaia&#39;s Sanctuary (Solo / 5 Player) - Dark Path</li>
+            <li>Gaia&#39;s Sanctuary - Trial (Solo / Party) - Eternal Sun Path</li>
+            <li>Guild Hall</li>
+          </ul>
+        </div>
+        <div class='dungeon-guide-item'>
+          <div class='dungeon-guide-head'>
+            <img class='dungeon-guide-icon' src='assets/eidolons/P00063.png' alt='Venus' loading='lazy'>
+            <h4>Venus</h4>
+          </div>
+          <ul>
+            <li>Gaia&#39;s Sanctuary - Judgment (Solo / Party)</li>
+            <li>Vault of Eternity - Chapter 4 (Party)</li>
+            <li>Secrets of Qingyan (Hell Mode)</li>
+            <li>Gate of Abandoning God (Hell Mode)</li>
+          </ul>
+        </div>
+        <div class='dungeon-guide-item'>
+          <div class='dungeon-guide-head'>
+            <img class='dungeon-guide-icon' src='assets/eidolons/P00059.png' alt='Verdandi' loading='lazy'>
+            <h4>Verdandi</h4>
+          </div>
+          <ul>
+            <li>Sky Tower F50</li>
+          </ul>
+        </div>
+        <div class='dungeon-guide-item'>
+          <div class='dungeon-guide-head'>
+            <img class='dungeon-guide-icon' src='assets/eidolons/P00031.png' alt='Vermilion' loading='lazy'>
+            <h4>Vermilion</h4>
+          </div>
+          <ul>
+            <li>Otherworld: Alabastren Temple (Hell)</li>
+            <li>Otherworld: Gydaie Glen (Party)</li>
+            <li>Otherworld: Miner&#39;s Steppe (Party)</li>
+            <li>Lament of the Thunder-Dragon King</li>
+            <li>Landing of the Sky-Dragon King</li>
+            <li>Siege of the Aqua-Dragon Queen</li>
+            <li>Gaia&#39;s Sanctuary (Solo / 5 Player) - Light Path</li>
+          </ul>
+        </div>
+        <div class='dungeon-guide-item'>
+          <div class='dungeon-guide-head'>
+            <img class='dungeon-guide-icon' src='assets/eidolons/P00019.png' alt='Yarnaros' loading='lazy'>
+            <h4>Yarnaros</h4>
+          </div>
+          <ul>
+            <li>Temple of Eidolons</li>
+            <li>Otherworld: Port Skandia (All Modes)</li>
+            <li>Otherworld: Helonia Coast (All Modes)</li>
+            <li>Otherworld: Crescent Hill (All Modes)</li>
+            <li>Gaia&#39;s Sanctuary (Solo / 5 Player) - Dark Path</li>
+            <li>Gaia&#39;s Sanctuary - Judgment (Solo / Party)</li>
+            <li>Hurricane Abyss (All Modes)</li>
+            <li>Guild Hall</li>
+            <li>Traveling Merchant: Emerald Tempest&#39;s Soul Box</li>
+          </ul>
+        </div>
+        <div class='dungeon-guide-item'>
+          <div class='dungeon-guide-head'>
+            <img class='dungeon-guide-icon' src='assets/eidolons/P00048.png' alt='Yumikaze' loading='lazy'>
+            <h4>Yumikaze</h4>
+          </div>
+          <ul>
+            <li>Eidolon Gossip - Chapter 15</li>
+            <li>Gaia&#39;s Sanctuary - Trial (Solo / Party) - Starry Night Path</li>
+            <li>Glacial Ice Cavern (Hell)</li>
+            <li>Subterranean Sanctuary (Hell)</li>
+            <li>Winged Duke&#39;s Domain</li>
+          </ul>
+        </div>
+        <div class='dungeon-guide-item'>
+          <div class='dungeon-guide-head'>
+            <img class='dungeon-guide-icon' src='assets/eidolons/P00022.png' alt='Zaahir' loading='lazy'>
+            <h4>Zaahir</h4>
+          </div>
+          <ul>
+            <li>Infernal Abyss (All Modes)</li>
+            <li>Gaia&#39;s Sanctuary (Solo / 5 Player) - Dark Path</li>
+            <li>Gaia&#39;s Sanctuary - Judgment (Solo / Party)</li>
+          </ul>
+        </div>
+        <div class='dungeon-guide-item'>
+          <div class='dungeon-guide-head'>
+            <img class='dungeon-guide-icon' src='assets/eidolons/P00052.png' alt='Zashi' loading='lazy'>
+            <h4>Zashi</h4>
+          </div>
+          <ul>
+            <li>Gaia&#39;s Sanctuary - Judgment (Solo / Party)</li>
+            <li>Dawn Passage (Hell)</li>
+            <li>Silent Ancient Castle (Hell)</li>
+            <li>Otherworld: Glacial Ice Cavern (Party / Hell)</li>
+            <li>Otherworld: Subterranean Sanctuary (Party / Hell)</li>
+            <li>Flowing Flame Forest</li>
+            <li>Ancient War God&#39;s Brutality Crystal Vault</li>
+          </ul>
+        </div>
+        <div class='dungeon-guide-item'>
+          <div class='dungeon-guide-head'>
+            <img class='dungeon-guide-icon' src='assets/eidolons/P00049.png' alt='Zephyrine' loading='lazy'>
+            <h4>Zephyrine</h4>
+          </div>
+          <ul>
+            <li>Glacial Ice Cavern (Hell)</li>
+            <li>Subterranean Sanctuary (Hell)</li>
+            <li>Winged Duke&#39;s Domain</li>
+          </ul>
+        </div>
+      </div>
+      <div class="dungeon-guide-actions"><button id="dungeonGuideCloseBtn" class="dungeon-guide-close" type="button">Close</button></div>
     </div>
   </div>
   <main class="wrap">
@@ -621,6 +1504,9 @@
     const limitBreakInfoBtn = document.getElementById('limitBreakInfoBtn');
     const limitBreakModal = document.getElementById('limitBreakModal');
     const limitBreakCloseBtn = document.getElementById('limitBreakCloseBtn');
+    const dungeonGuideInfoBtn = document.getElementById('dungeonGuideInfoBtn');
+    const dungeonGuideModal = document.getElementById('dungeonGuideModal');
+    const dungeonGuideCloseBtn = document.getElementById('dungeonGuideCloseBtn');
     function applyTheme(theme) {
       const t = (theme === 'light') ? 'light' : 'dark';
       document.body.setAttribute('data-theme', t);
@@ -654,6 +1540,12 @@
     limitBreakCloseBtn.addEventListener('click', closeLimitBreakModal);
     limitBreakModal.addEventListener('click', (ev) => { if (ev.target === limitBreakModal) closeLimitBreakModal(); });
     document.addEventListener('keydown', (ev) => { if (ev.key === 'Escape' && limitBreakModal.classList.contains('show')) closeLimitBreakModal(); });
+    function openDungeonGuideModal() { dungeonGuideModal.classList.add('show'); }
+    function closeDungeonGuideModal() { dungeonGuideModal.classList.remove('show'); }
+    dungeonGuideInfoBtn.addEventListener('click', openDungeonGuideModal);
+    dungeonGuideCloseBtn.addEventListener('click', closeDungeonGuideModal);
+    dungeonGuideModal.addEventListener('click', (ev) => { if (ev.target === dungeonGuideModal) closeDungeonGuideModal(); });
+    document.addEventListener('keydown', (ev) => { if (ev.key === 'Escape' && dungeonGuideModal.classList.contains('show')) closeDungeonGuideModal(); });
     q.addEventListener('input', () => {
       const term = q.value.toLowerCase().trim();
       document.querySelectorAll('section[data-section]').forEach(sec => {

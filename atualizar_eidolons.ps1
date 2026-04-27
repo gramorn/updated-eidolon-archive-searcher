@@ -10,6 +10,9 @@ Set-StrictMode -Version Latest
 Add-Type -AssemblyName System.Web
 
 $GuideIconsDir = "assets/icons"
+$DungeonGuideSheetUrl = "https://docs.google.com/spreadsheets/d/17pYlqk7__46yW7dDoClrQzK1hjJ85H7Hcvn0qYk7gHQ/gviz/tq?gid=0"
+$DungeonGuideSheetPageUrl = "https://docs.google.com/spreadsheets/d/17pYlqk7__46yW7dDoClrQzK1hjJ85H7Hcvn0qYk7gHQ/edit?gid=0"
+$DungeonGuideHardcodedFile = "dungeon_guide_hardcoded.json"
 $GuideIconSources = @{
     "I80914.png" = "https://cdn.aurakingdom-db.com/images/icons/I80914.png"
     "I81010.png" = "https://cdn.aurakingdom-db.com/images/icons/I81010.png"
@@ -161,11 +164,456 @@ function Get-ComboOverride {
     }
 }
 
+function Get-DungeonGuideItems {
+    param(
+        [string]$SheetUrl,
+        [array]$KnownEidolonNames = @()
+    )
+
+    $manualDungeonSources = @{
+        "Hebe" = @("Whirlpool Abyss II")
+        "Cerberus" = @("Infernal Abyss II")
+        "Izanami" = @("Avarice Abyss II")
+        "Michaela" = @("Abyss of Light II")
+        "Demeter" = @("Hurricane Abyss II")
+        "Hermes" = @("Thundering Abyss II")
+        "Justicia" = @("Vault of Eternity - Chapter 11 (Party)")
+    }
+
+    $mainStoryEidolons = @(
+        "Gigas", "Aelius", "Abraxas", "Benkei", "Faust", "Eligos", "Sigrun", "Nalani", "Uzuriel", "Tanith",
+        "Maja", "Bel-Chandra", "Vayu", "Nazrudin", "Yarnaros", "Ghodroon", "Quelkulan", "Zaahir", "Cyril", "Kotonoha",
+        "Tigerius Caesar", "Bahadur", "Tsubaki", "Cleopawtra", "Serena", "Endora", "Vermilion", "Shirayuki", "Kaiser", "Zeta",
+        "Hel", "Alucard", "Bealdor", "Kusanagi", "Hansel & Gretel", "Astraea", "Cesela", "Diao-Chan", "Uriel", "Amaterasu",
+        "Alice", "Ayako"
+    )
+
+    $response = Invoke-WebRequest -Uri $SheetUrl -UseBasicParsing
+    $raw = $response.Content
+    $jsonMatch = [regex]::Match($raw, "setResponse\((?<json>[\s\S]+)\);")
+    if (-not $jsonMatch.Success) {
+        throw "Could not parse dungeon guide source payload."
+    }
+
+    $payload = $jsonMatch.Groups["json"].Value | ConvertFrom-Json
+    if (-not $payload.table -or -not $payload.table.rows) {
+        return @()
+    }
+
+    $results = New-Object System.Collections.Generic.List[object]
+
+    $mainStoryNameLabel = ""
+    $mainStoryDungeonLabel = ""
+    if ($payload.table.cols -and $payload.table.cols.Count -ge 8) {
+        $mainStoryNameLabel = [string]$payload.table.cols[2].label
+        $mainStoryDungeonLabel = [string]$payload.table.cols[7].label
+    }
+
+    foreach ($row in $payload.table.rows) {
+        if (-not $row.c -or $row.c.Count -lt 8) {
+            continue
+        }
+
+        $nameCell = $row.c[2]
+        $locationCell = $row.c[7]
+        if ($null -eq $nameCell -or $null -eq $locationCell) {
+            continue
+        }
+
+        $rawName = [string]$nameCell.v
+        $locations = [string]$locationCell.v
+        if (-not $rawName -or -not $locations) {
+            continue
+        }
+
+        $name = (($rawName -split "\r?\n")[0]).Trim()
+        if ($name -match "^\?+$" -or $name -match "^Upcoming") {
+            continue
+        }
+
+        if ($locations.Trim().ToUpperInvariant() -eq "N/A") {
+            continue
+        }
+
+        $sourceLines = New-Object System.Collections.Generic.List[string]
+        foreach ($line in ($locations -split "\r?\n")) {
+            $cleanLine = ($line -replace "^-+\s*", "").Trim()
+            if (-not $cleanLine) {
+                continue
+            }
+
+            if (-not $sourceLines.Contains($cleanLine)) {
+                [void]$sourceLines.Add($cleanLine)
+            }
+        }
+
+        $namesToAdd = New-Object System.Collections.Generic.List[string]
+        if ($rawName -match "(?i)Main Story Eidolon") {
+            foreach ($storyName in $mainStoryEidolons) {
+                if (-not $storyName) {
+                    continue
+                }
+
+                $escapedName = [regex]::Escape([string]$storyName)
+                if ($rawName -match (("(?i)(^|[^A-Za-z0-9])" + $escapedName + "([^A-Za-z0-9]|$)"))) {
+                    if (-not $namesToAdd.Contains([string]$storyName)) {
+                        [void]$namesToAdd.Add([string]$storyName)
+                    }
+                }
+            }
+
+            if ($KnownEidolonNames -and $KnownEidolonNames.Count -gt 0) {
+                foreach ($knownName in ($KnownEidolonNames | Sort-Object { $_.Length } -Descending)) {
+                    if (-not $knownName) {
+                        continue
+                    }
+
+                    $escapedName = [regex]::Escape([string]$knownName)
+                    if ($rawName -match (("(?i)(^|[^A-Za-z0-9])" + $escapedName + "([^A-Za-z0-9]|$)"))) {
+                        if (-not $namesToAdd.Contains([string]$knownName)) {
+                            [void]$namesToAdd.Add([string]$knownName)
+                        }
+                    }
+                }
+            }
+        } else {
+            [void]$namesToAdd.Add($name)
+        }
+
+        if ($sourceLines.Count -gt 0) {
+            foreach ($nameToAdd in $namesToAdd) {
+                $entryLines = New-Object System.Collections.Generic.List[string]
+                foreach ($lineToAdd in $sourceLines) {
+                    [void]$entryLines.Add($lineToAdd)
+                }
+
+                if ($manualDungeonSources.ContainsKey($nameToAdd)) {
+                    foreach ($manualSource in $manualDungeonSources[$nameToAdd]) {
+                        if (-not $entryLines.Contains($manualSource)) {
+                            [void]$entryLines.Add($manualSource)
+                        }
+                    }
+                }
+
+                $results.Add([pscustomobject]@{
+                    Name = $nameToAdd
+                    Locations = @($entryLines)
+                })
+            }
+        }
+    }
+
+    if ($mainStoryNameLabel -match "(?i)Main Story Eidolon" -and $mainStoryDungeonLabel -and $mainStoryDungeonLabel.Trim().ToUpperInvariant() -ne "N/A") {
+        $mainStorySummaryLines = @(
+            "Main Story Eidolon (Dungeon source available).",
+            "Check the original spreadsheet for the exact dungeon route for this Eidolon."
+        )
+
+        foreach ($storyName in $mainStoryEidolons) {
+            if (-not $storyName) {
+                continue
+            }
+
+            $escapedName = [regex]::Escape([string]$storyName)
+            if ($mainStoryNameLabel -match (("(?i)(^|[^A-Za-z0-9])" + $escapedName + "([^A-Za-z0-9]|$)"))) {
+                $results.Add([pscustomobject]@{
+                    Name = $storyName
+                    Locations = @($mainStorySummaryLines)
+                })
+            }
+        }
+    }
+
+    foreach ($manualName in $manualDungeonSources.Keys) {
+        $existing = $results | Where-Object { $_.Name -eq $manualName } | Select-Object -First 1
+        if ($null -eq $existing) {
+            $results.Add([pscustomobject]@{
+                Name = $manualName
+                Locations = @($manualDungeonSources[$manualName])
+            })
+            continue
+        }
+
+        foreach ($manualSource in $manualDungeonSources[$manualName]) {
+            if (-not ($existing.Locations -contains $manualSource)) {
+                $existing.Locations = @($existing.Locations + $manualSource)
+            }
+        }
+    }
+
+    return @($results | Sort-Object Name)
+}
+
+function Get-DungeonGuideItemsFromSheetPage {
+    param(
+        [string]$SheetPageUrl,
+        [string[]]$KnownEidolonNames = @()
+    )
+
+    $response = Invoke-WebRequest -Uri $SheetPageUrl -UseBasicParsing
+    $raw = $response.Content
+    if (-not $raw) {
+        return @()
+    }
+
+    $manualDungeonSources = @{
+        "Hebe" = @("Whirlpool Abyss II")
+        "Cerberus" = @("Infernal Abyss II")
+        "Izanami" = @("Avarice Abyss II")
+        "Michaela" = @("Abyss of Light II")
+        "Demeter" = @("Hurricane Abyss II")
+        "Hermes" = @("Thundering Abyss II")
+        "Justicia" = @("Vault of Eternity - Chapter 11 (Party)")
+    }
+    $results = New-Object System.Collections.Generic.List[object]
+    $itemsByName = @{}
+    $knownNameMap = @{}
+    foreach ($known in @($KnownEidolonNames)) {
+        $normalizedKnown = ([string]$known).Trim().ToLowerInvariant()
+        if ($normalizedKnown) {
+            $knownNameMap[$normalizedKnown] = $true
+        }
+    }
+
+    $rows = [regex]::Matches($raw, '<tr\b[^>]*>(?<inner>[\s\S]*?)</tr>')
+    foreach ($row in $rows) {
+        $cells = [regex]::Matches($row.Groups["inner"].Value, '<td\b(?<attrs>[^>]*)>(?<inner>[\s\S]*?)</td>')
+        if ($cells.Count -eq 0) {
+            continue
+        }
+
+        $colMap = @{}
+        $cursor = 0
+        foreach ($cell in $cells) {
+            $attrs = [string]$cell.Groups["attrs"].Value
+            $inner = [string]$cell.Groups["inner"].Value
+
+            $colspan = 1
+            $colspanMatch = [regex]::Match($attrs, 'colspan\s*=\s*"(?<n>\d+)"')
+            if ($colspanMatch.Success) {
+                $colspan = [int]$colspanMatch.Groups["n"].Value
+            }
+
+            $text = ($inner -replace '<br\s*/?>', "`n")
+            $text = ($text -replace '<[^>]+>', '')
+            $text = [System.Web.HttpUtility]::HtmlDecode($text)
+            $text = ($text -replace '[\u00a0]+', ' ').Trim()
+
+            for ($i = 0; $i -lt $colspan; $i++) {
+                $colMap[$cursor + $i] = $text
+            }
+            $cursor += $colspan
+        }
+
+        $nameRaw = $null
+        foreach ($nameCol in 2..4) {
+            if ($colMap.ContainsKey($nameCol)) {
+                $candidate = [string]$colMap[$nameCol]
+                if (-not [string]::IsNullOrWhiteSpace($candidate)) {
+                    $nameRaw = $candidate
+                    break
+                }
+            }
+        }
+
+        $dungeonRaw = $null
+        foreach ($dungeonCol in 7..13) {
+            if ($colMap.ContainsKey($dungeonCol)) {
+                $candidate = [string]$colMap[$dungeonCol]
+                if (-not [string]::IsNullOrWhiteSpace($candidate)) {
+                    $dungeonRaw = $candidate
+                    break
+                }
+            }
+        }
+
+        if (-not $nameRaw -or -not $dungeonRaw) {
+            continue
+        }
+
+        $name = (($nameRaw -split "\r?\n")[0]).Trim()
+        if (-not $name -or $name -eq "Eidolon" -or $name -match "^\?+$" -or $name -match "^Upcoming" -or $name -match "(?i)^Main Story Eidolon") {
+            continue
+        }
+
+        if ($name -match '^(Green\s*=|Blue\s*=|Eidolon Spawn/Fragment Locations|Color legend and notes:)$') {
+            continue
+        }
+
+        if ($knownNameMap.Count -gt 0) {
+            $normalizedName = $name.ToLowerInvariant()
+            if (-not $knownNameMap.ContainsKey($normalizedName)) {
+                continue
+            }
+        }
+
+        if ($dungeonRaw.Trim().ToUpperInvariant() -eq "N/A") {
+            continue
+        }
+
+        $sourceLines = New-Object System.Collections.Generic.List[string]
+        foreach ($line in ($dungeonRaw -split "\r?\n")) {
+            $cleanLine = ($line -replace "^-+\s*", "").Trim()
+            if ($cleanLine -and -not $sourceLines.Contains($cleanLine)) {
+                [void]$sourceLines.Add($cleanLine)
+            }
+        }
+
+        if ($sourceLines.Count -eq 0) {
+            continue
+        }
+
+        if (-not $itemsByName.ContainsKey($name)) {
+            $itemsByName[$name] = New-Object System.Collections.Generic.List[string]
+        }
+        foreach ($source in $sourceLines) {
+            if (-not $itemsByName[$name].Contains($source)) {
+                [void]$itemsByName[$name].Add($source)
+            }
+        }
+    }
+
+    foreach ($name in ($itemsByName.Keys | Sort-Object)) {
+        $sourceLines = New-Object System.Collections.Generic.List[string]
+        foreach ($line in @($itemsByName[$name])) {
+            if (-not [string]::IsNullOrWhiteSpace($line) -and -not $sourceLines.Contains($line)) {
+                [void]$sourceLines.Add($line)
+            }
+        }
+
+        if ($manualDungeonSources.ContainsKey($name)) {
+            foreach ($manualSource in $manualDungeonSources[$name]) {
+                if (-not $sourceLines.Contains($manualSource)) {
+                    [void]$sourceLines.Add($manualSource)
+                }
+            }
+        }
+
+        if ($sourceLines.Count -gt 0) {
+            $results.Add([pscustomobject]@{
+                Name = $name
+                Locations = @($sourceLines)
+            })
+        }
+    }
+
+    foreach ($manualName in $manualDungeonSources.Keys) {
+        $existing = $results | Where-Object { $_.Name -eq $manualName } | Select-Object -First 1
+        if ($null -eq $existing) {
+            $results.Add([pscustomobject]@{
+                Name = $manualName
+                Locations = @($manualDungeonSources[$manualName])
+            })
+            continue
+        }
+
+        foreach ($manualSource in $manualDungeonSources[$manualName]) {
+            if (-not ($existing.Locations -contains $manualSource)) {
+                $existing.Locations = @($existing.Locations + $manualSource)
+            }
+        }
+    }
+
+    return @($results | Sort-Object Name)
+}
+
+function Get-HardcodedDungeonGuideItems {
+    param([string]$FilePath)
+
+    if (-not (Test-Path $FilePath)) {
+        return @()
+    }
+
+    $raw = Get-Content -Path $FilePath -Raw
+    if (-not $raw) {
+        return @()
+    }
+
+    $parsed = $raw | ConvertFrom-Json
+    $normalized = New-Object System.Collections.Generic.List[object]
+
+    foreach ($item in @($parsed)) {
+        if (-not $item.Name -or -not $item.Locations) {
+            continue
+        }
+
+        $locs = New-Object System.Collections.Generic.List[string]
+        foreach ($loc in @($item.Locations)) {
+            $cleanLoc = ([string]$loc).Trim()
+            if ($cleanLoc -and -not $locs.Contains($cleanLoc)) {
+                [void]$locs.Add($cleanLoc)
+            }
+        }
+
+        if ($locs.Count -gt 0) {
+            $normalized.Add([pscustomobject]@{
+                Name = ([string]$item.Name).Trim()
+                Locations = @($locs)
+            })
+        }
+    }
+
+    return @($normalized | Sort-Object Name)
+}
+
+function Merge-DungeonGuideItems {
+    param(
+        [array]$PrimaryItems,
+        [array]$FallbackItems
+    )
+
+    $mergedMap = @{}
+
+    foreach ($entry in @($FallbackItems) + @($PrimaryItems)) {
+        if (-not $entry -or -not $entry.Name) {
+            continue
+        }
+
+        $name = ([string]$entry.Name).Trim()
+        if (-not $name) {
+            continue
+        }
+
+        $key = Normalize-Key $name
+        if (-not $mergedMap.ContainsKey($key)) {
+            $mergedMap[$key] = [pscustomobject]@{
+                Name = $name
+                Locations = @()
+            }
+        }
+
+        foreach ($loc in @($entry.Locations)) {
+            $cleanLoc = ([string]$loc).Trim()
+            if ($cleanLoc -and -not ($mergedMap[$key].Locations -contains $cleanLoc)) {
+                $mergedMap[$key].Locations = @($mergedMap[$key].Locations + $cleanLoc)
+            }
+        }
+    }
+
+    return @($mergedMap.Values | Sort-Object Name)
+}
+
 function Build-PageHtml {
     param(
         [array]$Rows,
-        [hashtable]$IconMap
+        [hashtable]$IconMap,
+        [array]$DungeonGuideItems
     )
+
+    $dungeonGuideIconMap = @{}
+    foreach ($row in $Rows) {
+        foreach ($eid in $row.Eidolons) {
+            $normalized = Normalize-Key $eid.Name
+            if (-not $normalized -or $dungeonGuideIconMap.ContainsKey($normalized)) {
+                continue
+            }
+
+            $iconPath = Get-Local-Icon -RemoteUrl $eid.IconUrl -IconMap $IconMap
+            if ($iconPath) {
+                $dungeonGuideIconMap[$normalized] = $iconPath
+            }
+        }
+    }
 
     $preferredOrder = @(
         "PEN",
@@ -267,7 +715,7 @@ function Build-PageHtml {
     [void]$sb.AppendLine("    .info-menu-toggle::-webkit-details-marker { display:none; }")
     [void]$sb.AppendLine("    .info-menu-panel { position:absolute; right:0; top:46px; width:min(340px, 90vw); padding:10px; border:1px solid var(--line); border-radius:12px; background:var(--card); box-shadow:0 14px 30px rgba(0,0,0,.35); display:none; z-index:25; }")
     [void]$sb.AppendLine("    .info-menu[open] .info-menu-panel { display:grid; gap:8px; }")
-    [void]$sb.AppendLine("    .info-menu-panel .lucky-pack-btn, .info-menu-panel .wish-coin-btn, .info-menu-panel .limit-break-btn { width:100%; justify-content:flex-start; }")
+    [void]$sb.AppendLine("    .info-menu-panel .lucky-pack-btn, .info-menu-panel .wish-coin-btn, .info-menu-panel .limit-break-btn, .info-menu-panel .dungeon-guide-btn { width:100%; justify-content:flex-start; }")
     [void]$sb.AppendLine("    .lucky-pack-btn { height:40px; border-radius:10px; border:1px solid var(--line); background:var(--card); display:inline-flex; align-items:center; justify-content:center; cursor:pointer; padding:0 10px; gap:6px; color:var(--ink); font-size:0.82rem; font-weight:600; }")
     [void]$sb.AppendLine("    .lucky-pack-btn:hover { border-color:var(--accent); }")
     [void]$sb.AppendLine("    .lucky-pack-icon { width:24px; height:24px; border-radius:6px; object-fit:cover; }")
@@ -310,7 +758,26 @@ function Build-PageHtml {
     [void]$sb.AppendLine("    .limit-break-actions { display:flex; justify-content:flex-end; margin-top:12px; }")
     [void]$sb.AppendLine("    .limit-break-close { height:36px; border-radius:10px; border:1px solid var(--line); background:var(--card); color:var(--ink); cursor:pointer; padding:0 14px; }")
     [void]$sb.AppendLine("    .limit-break-close:hover { border-color:var(--accent); }")
-    [void]$sb.AppendLine("    @media (max-width:760px) { .top-row { align-items:stretch; flex-direction:column; } .top-actions { width:100%; justify-content:flex-start; } .lucky-pack-btn, .wish-coin-btn, .limit-break-btn { min-height:40px; padding:6px 10px; } .theme-toggle { flex:0 0 auto; } .info-menu-panel { position:static; width:100%; margin-top:8px; } th, td { padding:7px 6px; font-size:0.84rem; } }")
+    [void]$sb.AppendLine("    .dungeon-guide-btn { height:40px; border-radius:10px; border:1px solid var(--line); background:var(--card); display:inline-flex; align-items:center; justify-content:center; cursor:pointer; padding:0 10px; gap:6px; color:var(--ink); font-size:0.82rem; font-weight:600; }")
+    [void]$sb.AppendLine("    .dungeon-guide-btn:hover { border-color:var(--accent); }")
+    [void]$sb.AppendLine("    .dungeon-guide-modal-backdrop { position:fixed; inset:0; background:rgba(3, 8, 18, 0.65); display:none; align-items:center; justify-content:center; z-index:80; padding:16px; }")
+    [void]$sb.AppendLine("    .dungeon-guide-modal-backdrop.show { display:flex; }")
+    [void]$sb.AppendLine("    .dungeon-guide-modal { width:min(920px, 96vw); max-height:90vh; overflow:auto; background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px; box-shadow:0 20px 48px rgba(0,0,0,.45); }")
+    [void]$sb.AppendLine("    .dungeon-guide-modal h3 { margin:0 0 8px; font-size:1.02rem; color:var(--accent); }")
+    [void]$sb.AppendLine("    .dungeon-guide-modal p { margin:0 0 10px; color:var(--muted); font-size:0.9rem; }")
+    [void]$sb.AppendLine("    .dungeon-guide-modal p a { color:var(--accent); text-decoration:underline; text-underline-offset:2px; font-weight:600; }")
+    [void]$sb.AppendLine("    .dungeon-guide-modal p a:hover { filter:brightness(1.12); }")
+    [void]$sb.AppendLine("    .dungeon-guide-list { display:grid; grid-template-columns:repeat(auto-fit, minmax(230px, 1fr)); gap:10px; margin-top:10px; }")
+    [void]$sb.AppendLine("    .dungeon-guide-item { border:1px solid var(--line); border-radius:10px; padding:8px; background:var(--chip-bg); }")
+    [void]$sb.AppendLine("    .dungeon-guide-head { display:flex; align-items:center; gap:8px; margin-bottom:6px; }")
+    [void]$sb.AppendLine("    .dungeon-guide-icon { width:24px; height:24px; border-radius:50%; object-fit:cover; border:1px solid var(--icon-line); background:var(--icon-bg); flex:0 0 auto; }")
+    [void]$sb.AppendLine("    .dungeon-guide-item h4 { margin:0 0 6px; font-size:0.9rem; color:var(--ink); }")
+    [void]$sb.AppendLine("    .dungeon-guide-item ul { margin:0; padding-left:18px; }")
+    [void]$sb.AppendLine("    .dungeon-guide-item li { margin:3px 0; color:var(--muted); font-size:0.82rem; }")
+    [void]$sb.AppendLine("    .dungeon-guide-actions { display:flex; justify-content:flex-end; margin-top:12px; }")
+    [void]$sb.AppendLine("    .dungeon-guide-close { height:36px; border-radius:10px; border:1px solid var(--line); background:var(--card); color:var(--ink); cursor:pointer; padding:0 14px; }")
+    [void]$sb.AppendLine("    .dungeon-guide-close:hover { border-color:var(--accent); }")
+    [void]$sb.AppendLine("    @media (max-width:760px) { .top-row { align-items:stretch; flex-direction:column; } .top-actions { width:100%; justify-content:flex-start; } .lucky-pack-btn, .wish-coin-btn, .limit-break-btn, .dungeon-guide-btn { min-height:40px; padding:6px 10px; } .theme-toggle { flex:0 0 auto; } .info-menu-panel { position:static; width:100%; margin-top:8px; } .dungeon-guide-list { grid-template-columns:1fr; } th, td { padding:7px 6px; font-size:0.84rem; } }")
     [void]$sb.AppendLine("  </style>")
     [void]$sb.AppendLine("</head>")
     [void]$sb.AppendLine("<body style=`"background-color:#0f141d`">")
@@ -326,6 +793,7 @@ function Build-PageHtml {
     [void]$sb.AppendLine("            <button id=`"luckyPackInfoBtn`" class=`"lucky-pack-btn`" type=`"button`" title=`"What are Eidolon Lucky Packs?`" aria-label=`"What are Eidolon Lucky Packs?`">What is <img class=`"lucky-pack-icon`" src=`"assets/icons/I80914.png`" alt=`"Eidolon Lucky Pack`">?</button>")
     [void]$sb.AppendLine("            <button id=`"wishCoinInfoBtn`" class=`"wish-coin-btn`" type=`"button`" title=`"What are Eidolon Wish Coins?`" aria-label=`"What are Eidolon Wish Coins?`">What is <img class=`"wish-coin-icon`" src=`"assets/icons/I81010.png`" alt=`"Eidolon Wish Coin`">?</button>")
     [void]$sb.AppendLine("            <button id=`"limitBreakInfoBtn`" class=`"limit-break-btn`" type=`"button`" title=`"What are Card Breakthrough Devices?`" aria-label=`"What are Card Breakthrough Devices?`">What is <img class=`"limit-break-icon`" src=`"assets/icons/I80781.png`" alt=`"Card Breakthrough Device`">?</button>")
+    [void]$sb.AppendLine("            <button id=`"dungeonGuideInfoBtn`" class=`"dungeon-guide-btn`" type=`"button`" title=`"Where can I find Eidolon spawn locations?`" aria-label=`"Where can I find Eidolon spawn locations?`">Eidolon Spawn Location</button>")
     [void]$sb.AppendLine("          </div>")
     [void]$sb.AppendLine("        </details>")
     [void]$sb.AppendLine("        <button id=`"themeToggle`" class=`"theme-toggle`" type=`"button`" aria-label=`"Switch to light theme`" title=`"Switch to light theme`"><span id=`"themeIcon`" class=`"theme-icon`">☀</span></button>")
@@ -381,6 +849,49 @@ function Build-PageHtml {
     [void]$sb.AppendLine("      </ul>")
     [void]$sb.AppendLine("      <p>Prioritize reaching level 10 on cards with the strongest Status Bonuses for your build.</p>")
     [void]$sb.AppendLine("      <div class=`"limit-break-actions`"><button id=`"limitBreakCloseBtn`" class=`"limit-break-close`" type=`"button`">Close</button></div>")
+    [void]$sb.AppendLine("    </div>")
+    [void]$sb.AppendLine("  </div>")
+    [void]$sb.AppendLine("  <div id=`"dungeonGuideModal`" class=`"dungeon-guide-modal-backdrop`" role=`"dialog`" aria-modal=`"true`" aria-labelledby=`"dungeonGuideTitle`">")
+    [void]$sb.AppendLine("    <div class=`"dungeon-guide-modal`">")
+    [void]$sb.AppendLine("      <h3 id=`"dungeonGuideTitle`">Eidolon Spawn Location</h3>")
+    [void]$sb.AppendLine("      <p>Data provided by AngelicAse&#39;s spreadsheet: <a href=`"https://docs.google.com/spreadsheets/d/17pYlqk7__46yW7dDoClrQzK1hjJ85H7Hcvn0qYk7gHQ/edit?gid=0`" target=`"_blank`" rel=`"noopener noreferrer`">Eidolon Spawn &amp; Key Fragment Locations</a>.</p>")
+    [void]$sb.AppendLine("      <p><strong>Note:</strong> Eidolons not listed here may be obtained from the Loyalty Points shop, by buying from other players, through the Auction House, by playing Paragon, or from in-game events.</p>")
+    [void]$sb.AppendLine("      <div class=`"dungeon-guide-list`">")
+
+    if ($DungeonGuideItems -and $DungeonGuideItems.Count -gt 0) {
+        foreach ($guideItem in $DungeonGuideItems) {
+            $safeGuideName = [System.Web.HttpUtility]::HtmlEncode($guideItem.Name)
+            $normalizedGuideName = Normalize-Key $guideItem.Name
+            $guideIcon = ""
+            if ($dungeonGuideIconMap.ContainsKey($normalizedGuideName)) {
+                $guideIcon = [System.Web.HttpUtility]::HtmlEncode($dungeonGuideIconMap[$normalizedGuideName])
+            }
+
+            [void]$sb.AppendLine("        <div class='dungeon-guide-item'>")
+            [void]$sb.AppendLine("          <div class='dungeon-guide-head'>")
+            if ($guideIcon) {
+                [void]$sb.AppendLine("            <img class='dungeon-guide-icon' src='$guideIcon' alt='$safeGuideName' loading='lazy'>")
+            } else {
+                [void]$sb.AppendLine("            <span class='eido-icon eido-missing dungeon-guide-icon' aria-hidden='true'>?</span>")
+            }
+            [void]$sb.AppendLine("            <h4>$safeGuideName</h4>")
+            [void]$sb.AppendLine("          </div>")
+            [void]$sb.AppendLine("          <ul>")
+
+            foreach ($guideLocation in $guideItem.Locations) {
+                $safeGuideLocation = [System.Web.HttpUtility]::HtmlEncode([string]$guideLocation)
+                [void]$sb.AppendLine("            <li>$safeGuideLocation</li>")
+            }
+
+            [void]$sb.AppendLine("          </ul>")
+            [void]$sb.AppendLine("        </div>")
+        }
+    } else {
+        [void]$sb.AppendLine("        <div class='dungeon-guide-item'><h4>No dungeon data available</h4><ul><li>The source could not be loaded at generation time.</li></ul></div>")
+    }
+
+    [void]$sb.AppendLine("      </div>")
+    [void]$sb.AppendLine("      <div class=`"dungeon-guide-actions`"><button id=`"dungeonGuideCloseBtn`" class=`"dungeon-guide-close`" type=`"button`">Close</button></div>")
     [void]$sb.AppendLine("    </div>")
     [void]$sb.AppendLine("  </div>")
     [void]$sb.AppendLine("  <main class=`"wrap`">")
@@ -450,6 +961,9 @@ function Build-PageHtml {
     [void]$sb.AppendLine("    const limitBreakInfoBtn = document.getElementById('limitBreakInfoBtn');")
     [void]$sb.AppendLine("    const limitBreakModal = document.getElementById('limitBreakModal');")
     [void]$sb.AppendLine("    const limitBreakCloseBtn = document.getElementById('limitBreakCloseBtn');")
+    [void]$sb.AppendLine("    const dungeonGuideInfoBtn = document.getElementById('dungeonGuideInfoBtn');")
+    [void]$sb.AppendLine("    const dungeonGuideModal = document.getElementById('dungeonGuideModal');")
+    [void]$sb.AppendLine("    const dungeonGuideCloseBtn = document.getElementById('dungeonGuideCloseBtn');")
     [void]$sb.AppendLine("    function applyTheme(theme) {")
     [void]$sb.AppendLine("      const t = (theme === 'light') ? 'light' : 'dark';")
     [void]$sb.AppendLine("      document.body.setAttribute('data-theme', t);")
@@ -483,6 +997,12 @@ function Build-PageHtml {
     [void]$sb.AppendLine("    limitBreakCloseBtn.addEventListener('click', closeLimitBreakModal);")
     [void]$sb.AppendLine("    limitBreakModal.addEventListener('click', (ev) => { if (ev.target === limitBreakModal) closeLimitBreakModal(); });")
     [void]$sb.AppendLine("    document.addEventListener('keydown', (ev) => { if (ev.key === 'Escape' && limitBreakModal.classList.contains('show')) closeLimitBreakModal(); });")
+    [void]$sb.AppendLine("    function openDungeonGuideModal() { dungeonGuideModal.classList.add('show'); }")
+    [void]$sb.AppendLine("    function closeDungeonGuideModal() { dungeonGuideModal.classList.remove('show'); }")
+    [void]$sb.AppendLine("    dungeonGuideInfoBtn.addEventListener('click', openDungeonGuideModal);")
+    [void]$sb.AppendLine("    dungeonGuideCloseBtn.addEventListener('click', closeDungeonGuideModal);")
+    [void]$sb.AppendLine("    dungeonGuideModal.addEventListener('click', (ev) => { if (ev.target === dungeonGuideModal) closeDungeonGuideModal(); });")
+    [void]$sb.AppendLine("    document.addEventListener('keydown', (ev) => { if (ev.key === 'Escape' && dungeonGuideModal.classList.contains('show')) closeDungeonGuideModal(); });")
     [void]$sb.AppendLine("    q.addEventListener('input', () => {")
     [void]$sb.AppendLine("      const term = q.value.toLowerCase().trim();")
     [void]$sb.AppendLine("      document.querySelectorAll('section[data-section]').forEach(sec => {")
@@ -608,8 +1128,30 @@ foreach ($entry in $GuideIconSources.GetEnumerator()) {
     }
 }
 
+$hardcodedGuidePath = Join-Path (Get-Location) $DungeonGuideHardcodedFile
+$hardcodedDungeonGuideItems = Get-HardcodedDungeonGuideItems -FilePath $hardcodedGuidePath
+if ($hardcodedDungeonGuideItems.Count -gt 0) {
+    Write-Host ("      Hardcoded dungeon guide entries: " + $hardcodedDungeonGuideItems.Count)
+}
+
+$knownEidolonNames = @($rows | ForEach-Object { $_.Eidolons } | ForEach-Object { $_.Name } | Sort-Object -Unique)
+
+$dungeonGuideItems = @($hardcodedDungeonGuideItems)
+try {
+    Write-Host "      Loading dungeon Eidolon guide data..."
+    $liveDungeonGuideItems = Get-DungeonGuideItemsFromSheetPage -SheetPageUrl $DungeonGuideSheetPageUrl -KnownEidolonNames $knownEidolonNames
+    if ($liveDungeonGuideItems.Count -eq 0) {
+        $liveDungeonGuideItems = Get-DungeonGuideItems -SheetUrl $DungeonGuideSheetUrl -KnownEidolonNames $knownEidolonNames
+    }
+    $dungeonGuideItems = Merge-DungeonGuideItems -PrimaryItems $liveDungeonGuideItems -FallbackItems $hardcodedDungeonGuideItems
+    Write-Host ("      Dungeon guide entries: " + $dungeonGuideItems.Count)
+} catch {
+    Write-Warning ("Could not load dungeon guide source: " + $_.Exception.Message)
+    Write-Warning "Using hardcoded dungeon guide data only."
+}
+
 Write-Host "[3/4] Building page HTML..."
-$page = Build-PageHtml -Rows $rows -IconMap $iconMap
+$page = Build-PageHtml -Rows $rows -IconMap $iconMap -DungeonGuideItems $dungeonGuideItems
 
 Write-Host "[4/4] Saving file..."
 Set-Content -Path $OutputHtml -Value $page -Encoding UTF8
