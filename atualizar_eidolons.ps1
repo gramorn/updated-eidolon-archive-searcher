@@ -9,6 +9,12 @@ $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 Add-Type -AssemblyName System.Web
 
+$GuideIconsDir = "assets/icons"
+$GuideIconSources = @{
+    "I80914.png" = "https://cdn.aurakingdom-db.com/images/icons/I80914.png"
+    "I81010.png" = "https://cdn.aurakingdom-db.com/images/icons/I81010.png"
+}
+
 function Normalize-Key {
     param([string]$Text)
     return (($Text.ToLowerInvariant() -replace "[^a-z0-9]", "").Trim())
@@ -253,9 +259,36 @@ function Build-PageHtml {
     [void]$sb.AppendLine("    .eido-missing { display:inline-flex; align-items:center; justify-content:center; font-size:12px; color:#8e6f61; }")
     [void]$sb.AppendLine("    .combo-sep { color:var(--muted); font-weight:700; }")
     [void]$sb.AppendLine("    .top-row { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:8px; }")
+    [void]$sb.AppendLine("    .top-actions { display:flex; align-items:center; gap:8px; }")
+    [void]$sb.AppendLine("    .lucky-pack-btn { height:40px; border-radius:10px; border:1px solid var(--line); background:var(--card); display:inline-flex; align-items:center; justify-content:center; cursor:pointer; padding:0 10px; gap:6px; color:var(--ink); font-size:0.82rem; font-weight:600; }")
+    [void]$sb.AppendLine("    .lucky-pack-btn:hover { border-color:var(--accent); }")
+    [void]$sb.AppendLine("    .lucky-pack-icon { width:24px; height:24px; border-radius:6px; object-fit:cover; }")
+    [void]$sb.AppendLine("    .wish-coin-btn { height:40px; border-radius:10px; border:1px solid var(--line); background:var(--card); display:inline-flex; align-items:center; justify-content:center; cursor:pointer; padding:0 10px; gap:6px; color:var(--ink); font-size:0.82rem; font-weight:600; }")
+    [void]$sb.AppendLine("    .wish-coin-btn:hover { border-color:var(--accent); }")
+    [void]$sb.AppendLine("    .wish-coin-icon { width:24px; height:24px; border-radius:6px; object-fit:cover; }")
     [void]$sb.AppendLine("    .theme-toggle { width:40px; height:40px; border-radius:10px; border:1px solid var(--line); background:var(--card); color:var(--ink); display:inline-flex; align-items:center; justify-content:center; cursor:pointer; }")
     [void]$sb.AppendLine("    .theme-toggle:hover { border-color:var(--accent); }")
     [void]$sb.AppendLine("    .theme-icon { font-size:18px; line-height:1; }")
+    [void]$sb.AppendLine("    .lucky-pack-modal-backdrop { position:fixed; inset:0; background:rgba(3, 8, 18, 0.65); display:none; align-items:center; justify-content:center; z-index:80; padding:16px; }")
+    [void]$sb.AppendLine("    .lucky-pack-modal-backdrop.show { display:flex; }")
+    [void]$sb.AppendLine("    .lucky-pack-modal { width:min(680px, 96vw); background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px; box-shadow:0 20px 48px rgba(0,0,0,.45); }")
+    [void]$sb.AppendLine("    .lucky-pack-modal h3 { margin:0 0 8px; font-size:1.02rem; color:var(--accent); }")
+    [void]$sb.AppendLine("    .lucky-pack-modal p { margin:0 0 8px; }")
+    [void]$sb.AppendLine("    .lucky-pack-list { margin:6px 0 0; padding-left:18px; color:var(--ink); }")
+    [void]$sb.AppendLine("    .lucky-pack-list li { margin:4px 0; }")
+    [void]$sb.AppendLine("    .lucky-pack-actions { display:flex; justify-content:flex-end; margin-top:12px; }")
+    [void]$sb.AppendLine("    .lucky-pack-close { height:36px; border-radius:10px; border:1px solid var(--line); background:var(--card); color:var(--ink); cursor:pointer; padding:0 14px; }")
+    [void]$sb.AppendLine("    .lucky-pack-close:hover { border-color:var(--accent); }")
+    [void]$sb.AppendLine("    .wish-coin-modal-backdrop { position:fixed; inset:0; background:rgba(3, 8, 18, 0.65); display:none; align-items:center; justify-content:center; z-index:80; padding:16px; }")
+    [void]$sb.AppendLine("    .wish-coin-modal-backdrop.show { display:flex; }")
+    [void]$sb.AppendLine("    .wish-coin-modal { width:min(680px, 96vw); background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px; box-shadow:0 20px 48px rgba(0,0,0,.45); }")
+    [void]$sb.AppendLine("    .wish-coin-modal h3 { margin:0 0 8px; font-size:1.02rem; color:var(--accent); }")
+    [void]$sb.AppendLine("    .wish-coin-modal p { margin:0 0 8px; }")
+    [void]$sb.AppendLine("    .wish-coin-list { margin:6px 0 0; padding-left:18px; color:var(--ink); }")
+    [void]$sb.AppendLine("    .wish-coin-list li { margin:4px 0; }")
+    [void]$sb.AppendLine("    .wish-coin-actions { display:flex; justify-content:flex-end; margin-top:12px; }")
+    [void]$sb.AppendLine("    .wish-coin-close { height:36px; border-radius:10px; border:1px solid var(--line); background:var(--card); color:var(--ink); cursor:pointer; padding:0 14px; }")
+    [void]$sb.AppendLine("    .wish-coin-close:hover { border-color:var(--accent); }")
     [void]$sb.AppendLine("    @media (max-width:760px) { .top-row { align-items:center; } }")
     [void]$sb.AppendLine("  </style>")
     [void]$sb.AppendLine("</head>")
@@ -266,10 +299,49 @@ function Build-PageHtml {
     [void]$sb.AppendLine("        <h1>Eidolon Archive</h1>")
     [void]$sb.AppendLine("        <p>Data automatically extracted from AuraKingdom-DB.</p>")
     [void]$sb.AppendLine("      </div>")
-    [void]$sb.AppendLine("      <button id=`"themeToggle`" class=`"theme-toggle`" type=`"button`" aria-label=`"Switch to light theme`" title=`"Switch to light theme`"><span id=`"themeIcon`" class=`"theme-icon`">☀</span></button>")
+    [void]$sb.AppendLine("      <div class=`"top-actions`">")
+    [void]$sb.AppendLine("        <button id=`"luckyPackInfoBtn`" class=`"lucky-pack-btn`" type=`"button`" title=`"What are Eidolon Lucky Packs?`" aria-label=`"What are Eidolon Lucky Packs?`">What is <img class=`"lucky-pack-icon`" src=`"assets/icons/I80914.png`" alt=`"Eidolon Lucky Pack`">?</button>")
+    [void]$sb.AppendLine("        <button id=`"wishCoinInfoBtn`" class=`"wish-coin-btn`" type=`"button`" title=`"What are Eidolon Wish Coins?`" aria-label=`"What are Eidolon Wish Coins?`">What is <img class=`"wish-coin-icon`" src=`"assets/icons/I81010.png`" alt=`"Eidolon Wish Coin`">?</button>")
+    [void]$sb.AppendLine("        <button id=`"themeToggle`" class=`"theme-toggle`" type=`"button`" aria-label=`"Switch to light theme`" title=`"Switch to light theme`"><span id=`"themeIcon`" class=`"theme-icon`">☀</span></button>")
+    [void]$sb.AppendLine("      </div>")
     [void]$sb.AppendLine("    </div>")
     [void]$sb.AppendLine("    <input id=`"q`" class=`"search`" placeholder=`"Search by Eidolon, combo or bonus...`" title=`"Type to filter combos by Eidolon, combo, or bonus`" aria-label=`"Search combos`">")
     [void]$sb.AppendLine("  </div></div>")
+    [void]$sb.AppendLine("  <div id=`"luckyPackModal`" class=`"lucky-pack-modal-backdrop`" role=`"dialog`" aria-modal=`"true`" aria-labelledby=`"luckyPackTitle`">")
+    [void]$sb.AppendLine("    <div class=`"lucky-pack-modal`">")
+    [void]$sb.AppendLine("      <h3 id=`"luckyPackTitle`">Eidolon Lucky Packs</h3>")
+    [void]$sb.AppendLine("      <p>Eidolon Lucky Packs are used at the Eidolon Den in your house to level up intimacy.</p>")
+    [void]$sb.AppendLine("      <p>The basic stats gained by intimacy leveling are applied to your player:</p>")
+    [void]$sb.AppendLine("      <ul class=`"lucky-pack-list`">")
+    [void]$sb.AppendLine("        <li>DMG</li>")
+    [void]$sb.AppendLine("        <li>CRIT</li>")
+    [void]$sb.AppendLine("        <li>SPD</li>")
+    [void]$sb.AppendLine("        <li>EVA</li>")
+    [void]$sb.AppendLine("        <li>HP</li>")
+    [void]$sb.AppendLine("        <li>DEF</li>")
+    [void]$sb.AppendLine("      </ul>")
+    [void]$sb.AppendLine("      <p>Because of this, all Eidolons should be leveled to at least intimacy level 8. It usually takes about 280 Eidolon Lucky Packs to go from level 1 to 8. Level 10 is optional.</p>")
+    [void]$sb.AppendLine("      <div class=`"lucky-pack-actions`"><button id=`"luckyPackCloseBtn`" class=`"lucky-pack-close`" type=`"button`">Close</button></div>")
+    [void]$sb.AppendLine("    </div>")
+    [void]$sb.AppendLine("  </div>")
+    [void]$sb.AppendLine("  <div id=`"wishCoinModal`" class=`"wish-coin-modal-backdrop`" role=`"dialog`" aria-modal=`"true`" aria-labelledby=`"wishCoinTitle`">")
+    [void]$sb.AppendLine("    <div class=`"wish-coin-modal`">")
+    [void]$sb.AppendLine("      <h3 id=`"wishCoinTitle`">Eidolon Wish Coins</h3>")
+    [void]$sb.AppendLine("      <p>Wish Coins are used to fulfill an Eidolon's wish without needing to gather what they ask for. They are a shortcut to fulfill wishes.</p>")
+    [void]$sb.AppendLine("      <p>All stats gained this way are applied to your player.</p>")
+    [void]$sb.AppendLine("      <p>Wish Coin cost per wish level:</p>")
+    [void]$sb.AppendLine("      <ul class=`"wish-coin-list`">")
+    [void]$sb.AppendLine("        <li>Wish 1: 1 coin</li>")
+    [void]$sb.AppendLine("        <li>Wish 2: 2 coins</li>")
+    [void]$sb.AppendLine("        <li>Wish 3: 4 coins</li>")
+    [void]$sb.AppendLine("        <li>Wish 4: 8 coins</li>")
+    [void]$sb.AppendLine("        <li>Wish 5: 16 coins</li>")
+    [void]$sb.AppendLine("        <li>Wish 6: 32 coins</li>")
+    [void]$sb.AppendLine("      </ul>")
+    [void]$sb.AppendLine("      <p>All Eidolons should have their wishes fulfilled. This is one of the greatest sources of raw stats.</p>")
+    [void]$sb.AppendLine("      <div class=`"wish-coin-actions`"><button id=`"wishCoinCloseBtn`" class=`"wish-coin-close`" type=`"button`">Close</button></div>")
+    [void]$sb.AppendLine("    </div>")
+    [void]$sb.AppendLine("  </div>")
     [void]$sb.AppendLine("  <main class=`"wrap`">")
 
     foreach ($cat in $orderedCats) {
@@ -328,6 +400,12 @@ function Build-PageHtml {
     [void]$sb.AppendLine("    const q = document.getElementById('q');")
     [void]$sb.AppendLine("    const themeToggle = document.getElementById('themeToggle');")
     [void]$sb.AppendLine("    const themeIcon = document.getElementById('themeIcon');")
+    [void]$sb.AppendLine("    const luckyPackInfoBtn = document.getElementById('luckyPackInfoBtn');")
+    [void]$sb.AppendLine("    const luckyPackModal = document.getElementById('luckyPackModal');")
+    [void]$sb.AppendLine("    const luckyPackCloseBtn = document.getElementById('luckyPackCloseBtn');")
+    [void]$sb.AppendLine("    const wishCoinInfoBtn = document.getElementById('wishCoinInfoBtn');")
+    [void]$sb.AppendLine("    const wishCoinModal = document.getElementById('wishCoinModal');")
+    [void]$sb.AppendLine("    const wishCoinCloseBtn = document.getElementById('wishCoinCloseBtn');")
     [void]$sb.AppendLine("    function applyTheme(theme) {")
     [void]$sb.AppendLine("      const t = (theme === 'light') ? 'light' : 'dark';")
     [void]$sb.AppendLine("      document.body.setAttribute('data-theme', t);")
@@ -343,6 +421,18 @@ function Build-PageHtml {
     [void]$sb.AppendLine("      const current = document.body.getAttribute('data-theme') || 'dark';")
     [void]$sb.AppendLine("      applyTheme(current === 'dark' ? 'light' : 'dark');")
     [void]$sb.AppendLine("    });")
+    [void]$sb.AppendLine("    function openLuckyPackModal() { luckyPackModal.classList.add('show'); }")
+    [void]$sb.AppendLine("    function closeLuckyPackModal() { luckyPackModal.classList.remove('show'); }")
+    [void]$sb.AppendLine("    luckyPackInfoBtn.addEventListener('click', openLuckyPackModal);")
+    [void]$sb.AppendLine("    luckyPackCloseBtn.addEventListener('click', closeLuckyPackModal);")
+    [void]$sb.AppendLine("    luckyPackModal.addEventListener('click', (ev) => { if (ev.target === luckyPackModal) closeLuckyPackModal(); });")
+    [void]$sb.AppendLine("    document.addEventListener('keydown', (ev) => { if (ev.key === 'Escape' && luckyPackModal.classList.contains('show')) closeLuckyPackModal(); });")
+    [void]$sb.AppendLine("    function openWishCoinModal() { wishCoinModal.classList.add('show'); }")
+    [void]$sb.AppendLine("    function closeWishCoinModal() { wishCoinModal.classList.remove('show'); }")
+    [void]$sb.AppendLine("    wishCoinInfoBtn.addEventListener('click', openWishCoinModal);")
+    [void]$sb.AppendLine("    wishCoinCloseBtn.addEventListener('click', closeWishCoinModal);")
+    [void]$sb.AppendLine("    wishCoinModal.addEventListener('click', (ev) => { if (ev.target === wishCoinModal) closeWishCoinModal(); });")
+    [void]$sb.AppendLine("    document.addEventListener('keydown', (ev) => { if (ev.key === 'Escape' && wishCoinModal.classList.contains('show')) closeWishCoinModal(); });")
     [void]$sb.AppendLine("    q.addEventListener('input', () => {")
     [void]$sb.AppendLine("      const term = q.value.toLowerCase().trim();")
     [void]$sb.AppendLine("      document.querySelectorAll('section[data-section]').forEach(sec => {")
@@ -432,8 +522,9 @@ if ($rows.Count -eq 0) {
 }
 
 $iconMap = @{}
+Write-Host "[2/4] Preparing icons..."
 if (-not $KeepRemoteIcons) {
-    Write-Host "[2/4] Downloading icons to $AssetsDir..."
+    Write-Host "      Downloading Eidolon icons to $AssetsDir..."
     $assetsPath = Join-Path (Get-Location) $AssetsDir
     New-Item -Path $assetsPath -ItemType Directory -Force | Out-Null
 
@@ -455,7 +546,16 @@ if (-not $KeepRemoteIcons) {
         $iconMap[$remote] = ($AssetsDir.Replace("\", "/") + "/" + $fileName)
     }
 } else {
-    Write-Host "[2/4] Keeping remote icons (no local download)."
+    Write-Host "      Keeping remote Eidolon icons (no local download)."
+}
+
+$guideIconsPath = Join-Path (Get-Location) $GuideIconsDir
+New-Item -Path $guideIconsPath -ItemType Directory -Force | Out-Null
+foreach ($entry in $GuideIconSources.GetEnumerator()) {
+    $targetPath = Join-Path $guideIconsPath $entry.Key
+    if (-not (Test-Path $targetPath)) {
+        Invoke-WebRequest -Uri $entry.Value -OutFile $targetPath -UseBasicParsing
+    }
 }
 
 Write-Host "[3/4] Building page HTML..."
