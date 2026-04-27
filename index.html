@@ -35,7 +35,7 @@
     .info-menu-toggle::-webkit-details-marker { display:none; }
     .info-menu-panel { position:absolute; right:0; top:46px; width:min(340px, 90vw); padding:10px; border:1px solid var(--line); border-radius:12px; background:var(--card); box-shadow:0 14px 30px rgba(0,0,0,.35); display:none; z-index:25; }
     .info-menu[open] .info-menu-panel { display:grid; gap:8px; }
-    .info-menu-panel .lucky-pack-btn, .info-menu-panel .wish-coin-btn, .info-menu-panel .limit-break-btn, .info-menu-panel .dungeon-guide-btn { width:100%; justify-content:flex-start; }
+    .info-menu-panel .lucky-pack-btn, .info-menu-panel .wish-coin-btn, .info-menu-panel .limit-break-btn, .info-menu-panel .dungeon-guide-btn, .info-menu-panel .leveling-guide-btn { width:100%; justify-content:flex-start; }
     .lucky-pack-btn { height:40px; border-radius:10px; border:1px solid var(--line); background:var(--card); display:inline-flex; align-items:center; justify-content:center; cursor:pointer; padding:0 10px; gap:6px; color:var(--ink); font-size:0.82rem; font-weight:600; }
     .lucky-pack-btn:hover { border-color:var(--accent); }
     .lucky-pack-icon { width:24px; height:24px; border-radius:6px; object-fit:cover; }
@@ -45,6 +45,8 @@
     .limit-break-btn { height:40px; border-radius:10px; border:1px solid var(--line); background:var(--card); display:inline-flex; align-items:center; justify-content:center; cursor:pointer; padding:0 10px; gap:6px; color:var(--ink); font-size:0.82rem; font-weight:600; }
     .limit-break-btn:hover { border-color:var(--accent); }
     .limit-break-icon { width:24px; height:24px; border-radius:6px; object-fit:cover; }
+    .leveling-guide-btn { height:40px; border-radius:10px; border:1px solid var(--line); background:var(--card); display:inline-flex; align-items:center; justify-content:center; cursor:pointer; padding:0 10px; gap:6px; color:var(--ink); font-size:0.82rem; font-weight:600; }
+    .leveling-guide-btn:hover { border-color:var(--accent); }
     .theme-toggle { width:40px; height:40px; border-radius:10px; border:1px solid var(--line); background:var(--card); color:var(--ink); display:inline-flex; align-items:center; justify-content:center; cursor:pointer; }
     .theme-toggle:hover { border-color:var(--accent); }
     .theme-icon { font-size:18px; line-height:1; }
@@ -78,6 +80,32 @@
     .limit-break-actions { display:flex; justify-content:flex-end; margin-top:12px; }
     .limit-break-close { height:36px; border-radius:10px; border:1px solid var(--line); background:var(--card); color:var(--ink); cursor:pointer; padding:0 14px; }
     .limit-break-close:hover { border-color:var(--accent); }
+    .leveling-guide-modal-backdrop { position:fixed; inset:0; background:rgba(3, 8, 18, 0.65); display:none; align-items:center; justify-content:center; z-index:80; padding:16px; }
+    .leveling-guide-modal-backdrop.show { display:flex; }
+    .leveling-guide-modal { width:min(760px, 96vw); background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px; box-shadow:0 20px 48px rgba(0,0,0,.45); }
+    .leveling-guide-modal h3 { margin:0 0 8px; font-size:1.02rem; color:var(--accent); }
+    .leveling-guide-modal p { margin:0 0 8px; color:var(--muted); }
+    .leveling-guide-list { margin:8px 0 0; padding:0; list-style:none; display:grid; gap:8px; }
+    .leveling-guide-list li { display:flex; align-items:center; justify-content:space-between; gap:10px; border:1px solid var(--line); border-radius:10px; background:var(--chip-bg); padding:8px 10px; }
+    .leveling-guide-item { display:flex; align-items:center; gap:8px; }
+    .leveling-guide-icon { width:24px; height:24px; border-radius:6px; object-fit:cover; }
+    .leveling-guide-qty { font-weight:700; color:var(--ink); }
+    .skill-leveling-box { margin-top:12px; border:1px solid var(--line); border-radius:10px; background:var(--chip-bg); padding:10px; }
+    .skill-leveling-head { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
+    .skill-leveling-icon { width:24px; height:24px; border-radius:6px; object-fit:cover; }
+    .skill-leveling-title { margin:0; font-size:0.92rem; color:var(--ink); }
+    .skill-leveling-grid { margin:8px 0 0; padding:0; list-style:none; display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:8px; }
+    .skill-leveling-grid li { border:1px solid var(--line); border-radius:10px; padding:8px; background:var(--card); display:flex; align-items:center; justify-content:space-between; gap:8px; }
+    .quality-chip { display:inline-flex; align-items:center; border-radius:999px; padding:2px 8px; font-size:0.76rem; font-weight:700; }
+    .q-green { background:#1f9d55; color:#fff; }
+    .q-blue { background:#1e62d0; color:#fff; }
+    .q-orange { background:#d97706; color:#fff; }
+    .q-purple { background:#7e3af2; color:#fff; }
+    .q-gold { background:#c89b22; color:#1f1a0e; }
+    .skill-total { margin-top:8px; font-size:0.84rem; color:var(--ink); font-weight:700; }
+    .leveling-guide-actions { display:flex; justify-content:flex-end; margin-top:12px; }
+    .leveling-guide-close { height:36px; border-radius:10px; border:1px solid var(--line); background:var(--card); color:var(--ink); cursor:pointer; padding:0 14px; }
+    .leveling-guide-close:hover { border-color:var(--accent); }
     .dungeon-guide-btn { height:40px; border-radius:10px; border:1px solid var(--line); background:var(--card); display:inline-flex; align-items:center; justify-content:center; cursor:pointer; padding:0 10px; gap:6px; color:var(--ink); font-size:0.82rem; font-weight:600; }
     .dungeon-guide-btn:hover { border-color:var(--accent); }
     .dungeon-guide-modal-backdrop { position:fixed; inset:0; background:rgba(3, 8, 18, 0.65); display:none; align-items:center; justify-content:center; z-index:80; padding:16px; }
@@ -97,7 +125,7 @@
     .dungeon-guide-actions { display:flex; justify-content:flex-end; margin-top:12px; }
     .dungeon-guide-close { height:36px; border-radius:10px; border:1px solid var(--line); background:var(--card); color:var(--ink); cursor:pointer; padding:0 14px; }
     .dungeon-guide-close:hover { border-color:var(--accent); }
-    @media (max-width:760px) { .top-row { align-items:stretch; flex-direction:column; } .top-actions { width:100%; justify-content:flex-start; } .lucky-pack-btn, .wish-coin-btn, .limit-break-btn, .dungeon-guide-btn { min-height:40px; padding:6px 10px; } .theme-toggle { flex:0 0 auto; } .info-menu-panel { position:static; width:100%; margin-top:8px; } .dungeon-guide-list { grid-template-columns:1fr; } th, td { padding:7px 6px; font-size:0.84rem; } }
+    @media (max-width:760px) { .top-row { align-items:stretch; flex-direction:column; } .top-actions { width:100%; justify-content:flex-start; } .lucky-pack-btn, .wish-coin-btn, .limit-break-btn, .dungeon-guide-btn, .leveling-guide-btn { min-height:40px; padding:6px 10px; } .theme-toggle { flex:0 0 auto; } .info-menu-panel { position:static; width:100%; margin-top:8px; } .dungeon-guide-list { grid-template-columns:1fr; } .leveling-guide-list li { align-items:flex-start; flex-direction:column; } .skill-leveling-grid { grid-template-columns:1fr; } th, td { padding:7px 6px; font-size:0.84rem; } }
   </style>
 </head>
 <body style="background-color:#0f141d">
@@ -113,6 +141,7 @@
             <button id="luckyPackInfoBtn" class="lucky-pack-btn" type="button" title="What are Eidolon Lucky Packs?" aria-label="What are Eidolon Lucky Packs?">What is <img class="lucky-pack-icon" src="assets/icons/I80914.png" alt="Eidolon Lucky Pack">?</button>
             <button id="wishCoinInfoBtn" class="wish-coin-btn" type="button" title="What are Eidolon Wish Coins?" aria-label="What are Eidolon Wish Coins?">What is <img class="wish-coin-icon" src="assets/icons/I81010.png" alt="Eidolon Wish Coin">?</button>
             <button id="limitBreakInfoBtn" class="limit-break-btn" type="button" title="What are Card Breakthrough Devices?" aria-label="What are Card Breakthrough Devices?">What is <img class="limit-break-icon" src="assets/icons/I80781.png" alt="Card Breakthrough Device">?</button>
+            <button id="levelingGuideInfoBtn" class="leveling-guide-btn" type="button" title="How to level Eidolons from 25 to 80?" aria-label="How to level Eidolons from 25 to 80?">Eidolon Leveling</button>
             <button id="dungeonGuideInfoBtn" class="dungeon-guide-btn" type="button" title="Where can I find Eidolon spawn locations?" aria-label="Where can I find Eidolon spawn locations?">Eidolon Spawn Location</button>
           </div>
         </details>
@@ -169,6 +198,34 @@
       </ul>
       <p>Prioritize reaching level 10 on cards with the strongest Status Bonuses for your build.</p>
       <div class="limit-break-actions"><button id="limitBreakCloseBtn" class="limit-break-close" type="button">Close</button></div>
+    </div>
+  </div>
+  <div id="levelingGuideModal" class="leveling-guide-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="levelingGuideTitle">
+    <div class="leveling-guide-modal">
+      <h3 id="levelingGuideTitle">Eidolon Leveling</h3>
+      <p>To level an Eidolon from level 25 to 80, you can use the crystals below:</p>
+      <ul class="leveling-guide-list">
+        <li><span class="leveling-guide-item"><img class="leveling-guide-icon" src="assets/icons/I00469.png" alt="Large XP Crystal"><span>Large XP Crystal</span></span><span class="leveling-guide-qty">10881</span></li>
+        <li><span class="leveling-guide-item"><img class="leveling-guide-icon" src="assets/icons/I00464.png" alt="Pure XP Crystal"><span>Pure XP Crystal</span></span><span class="leveling-guide-qty">8161</span></li>
+        <li><span class="leveling-guide-item"><img class="leveling-guide-icon" src="assets/icons/I01677.png" alt="Dazzling XP Crystal"><span>Dazzling XP Crystal</span></span><span class="leveling-guide-qty">3835</span></li>
+        <li><span class="leveling-guide-item"><img class="leveling-guide-icon" src="assets/icons/I02464.png" alt="Gorgeous XP Crystal"><span>Gorgeous XP Crystal</span></span><span class="leveling-guide-qty">384</span></li>
+        <li><span class="leveling-guide-item"><img class="leveling-guide-icon" src="assets/icons/I02465.png" alt="Rainbow XP Crystal"><span>Rainbow XP Crystal</span></span><span class="leveling-guide-qty">38</span></li>
+        <li><span class="leveling-guide-item"><img class="leveling-guide-icon" src="assets/icons/I02466.png" alt="XP Stone"><span>XP Stone</span></span><span class="leveling-guide-qty">4</span></li>
+      </ul>
+      <p><strong>Note:</strong> Medium and Small crystals are used to craft keys and raise an Eidolon to two stars, respectively.</p>
+      <div class="skill-leveling-box">
+        <div class="skill-leveling-head"><img class="skill-leveling-icon" src="assets/icons/I02540.png" alt="Mana Starstone"><h4 class="skill-leveling-title">Eidolon Skill Leveling (Mana Starstone)</h4></div>
+        <p>Leveling the skills of your main Eidolons is very important, because their skills gain stronger and additional buffs/debuffs.</p>
+        <ul class="skill-leveling-grid">
+          <li><span class="quality-chip q-green">Green</span><span>120 stones</span></li>
+          <li><span class="quality-chip q-blue">Blue</span><span>530 stones</span></li>
+          <li><span class="quality-chip q-orange">Orange</span><span>1140 stones</span></li>
+          <li><span class="quality-chip q-purple">Purple</span><span>1950 stones</span></li>
+          <li><span class="quality-chip q-gold">Gold</span><span>2960 stones</span></li>
+        </ul>
+        <div class="skill-total">Total Mana Starstone needed: 6700</div>
+      </div>
+      <div class="leveling-guide-actions"><button id="levelingGuideCloseBtn" class="leveling-guide-close" type="button">Close</button></div>
     </div>
   </div>
   <div id="dungeonGuideModal" class="dungeon-guide-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="dungeonGuideTitle">
@@ -1504,6 +1561,9 @@
     const limitBreakInfoBtn = document.getElementById('limitBreakInfoBtn');
     const limitBreakModal = document.getElementById('limitBreakModal');
     const limitBreakCloseBtn = document.getElementById('limitBreakCloseBtn');
+    const levelingGuideInfoBtn = document.getElementById('levelingGuideInfoBtn');
+    const levelingGuideModal = document.getElementById('levelingGuideModal');
+    const levelingGuideCloseBtn = document.getElementById('levelingGuideCloseBtn');
     const dungeonGuideInfoBtn = document.getElementById('dungeonGuideInfoBtn');
     const dungeonGuideModal = document.getElementById('dungeonGuideModal');
     const dungeonGuideCloseBtn = document.getElementById('dungeonGuideCloseBtn');
@@ -1540,6 +1600,12 @@
     limitBreakCloseBtn.addEventListener('click', closeLimitBreakModal);
     limitBreakModal.addEventListener('click', (ev) => { if (ev.target === limitBreakModal) closeLimitBreakModal(); });
     document.addEventListener('keydown', (ev) => { if (ev.key === 'Escape' && limitBreakModal.classList.contains('show')) closeLimitBreakModal(); });
+    function openLevelingGuideModal() { levelingGuideModal.classList.add('show'); }
+    function closeLevelingGuideModal() { levelingGuideModal.classList.remove('show'); }
+    levelingGuideInfoBtn.addEventListener('click', openLevelingGuideModal);
+    levelingGuideCloseBtn.addEventListener('click', closeLevelingGuideModal);
+    levelingGuideModal.addEventListener('click', (ev) => { if (ev.target === levelingGuideModal) closeLevelingGuideModal(); });
+    document.addEventListener('keydown', (ev) => { if (ev.key === 'Escape' && levelingGuideModal.classList.contains('show')) closeLevelingGuideModal(); });
     function openDungeonGuideModal() { dungeonGuideModal.classList.add('show'); }
     function closeDungeonGuideModal() { dungeonGuideModal.classList.remove('show'); }
     dungeonGuideInfoBtn.addEventListener('click', openDungeonGuideModal);
