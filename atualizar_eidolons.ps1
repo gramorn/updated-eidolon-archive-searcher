@@ -311,7 +311,6 @@ function Build-PageHtml {
     [void]$sb.AppendLine("    <div class=`"top-row`">")
     [void]$sb.AppendLine("      <div>")
     [void]$sb.AppendLine("        <h1>Eidolon Archive</h1>")
-    [void]$sb.AppendLine("        <p>Data automatically extracted from AuraKingdom-DB.</p>")
     [void]$sb.AppendLine("      </div>")
     [void]$sb.AppendLine("      <div class=`"top-actions`">")
     [void]$sb.AppendLine("        <button id=`"luckyPackInfoBtn`" class=`"lucky-pack-btn`" type=`"button`" title=`"What are Eidolon Lucky Packs?`" aria-label=`"What are Eidolon Lucky Packs?`">What is <img class=`"lucky-pack-icon`" src=`"assets/icons/I80914.png`" alt=`"Eidolon Lucky Pack`">?</button>")
