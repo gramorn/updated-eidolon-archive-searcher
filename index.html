@@ -67,7 +67,8 @@
     .boost-guide-btn:hover { border-color:var(--accent); }
     .theme-toggle { width:40px; height:40px; border-radius:10px; border:1px solid var(--line); background:var(--card); color:var(--ink); display:inline-flex; align-items:center; justify-content:center; cursor:pointer; }
     .theme-toggle:hover { border-color:var(--accent); }
-    .theme-icon { font-size:18px; line-height:1; }
+    .theme-icon { display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; }
+    .theme-icon svg { display:block; width:20px; height:20px; }
     .lang-selector { position:relative; display:none; align-items:center; gap:2px; }
     .lang-btn { background:none; border:1px solid transparent; border-radius:6px; cursor:pointer; padding:3px 5px; line-height:1; display:none; align-items:center; transition:border-color 0.15s, background 0.15s; }
     .lang-btn img { width:22px; height:15px; object-fit:cover; border-radius:2px; display:block; }
@@ -285,7 +286,7 @@
           <button class='lang-btn' data-lang='fr' title='Franï¿½ais' type='button'><img src='https://flagcdn.com/20x15/fr.png' alt='Franï¿½ais' width='20' height='15'/></button>
         </div>
         <button id="aboutInfoBtn" class="boost-guide-btn" type="button" title="About this project" aria-label="About this project">About</button>
-        <button id="themeToggle" class="theme-toggle" type="button" aria-label="Switch to light theme" title="Switch to light theme"><span id="themeIcon" class="theme-icon">&#x2600;&#xFE0F;</span></button>
+        <button id="themeToggle" class="theme-toggle" type="button" aria-label="Switch to light theme" title="Switch to light theme"><span id="themeIcon" class="theme-icon"></span></button>
       </div>
     </div>
     <input id="q" class="search" placeholder="Search by Eidolon, combo or bonus..." data-i18n-placeholder="search_placeholder" title="Type to filter combos by Eidolon, combo, or bonus" aria-label="Search combos">
@@ -2105,7 +2106,9 @@
       const t = (theme === 'light') ? 'light' : 'dark';
       document.body.setAttribute('data-theme', t);
       document.body.style.backgroundColor = (t === 'dark') ? '#0f141d' : '#fff6ef';
-      themeIcon.textContent = (t === 'dark') ? '☀️' : '🌙';
+      themeIcon.innerHTML = (t === 'dark')
+        ? '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" aria-hidden="true"><circle cx="12" cy="12" r="5"/><g stroke="white" stroke-width="2" stroke-linecap="round"><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/><line x1="4.22" y1="4.22" x2="6.34" y2="6.34"/><line x1="17.66" y1="17.66" x2="19.78" y2="19.78"/><line x1="19.78" y1="4.22" x2="17.66" y2="6.34"/><line x1="6.34" y1="17.66" x2="4.22" y2="19.78"/></g></svg>'
+        : '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="black" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/></svg>';
       const actionLabel = (t === 'dark') ? 'Switch to light theme' : 'Switch to dark theme';
       themeToggle.setAttribute('aria-label', actionLabel);
       themeToggle.setAttribute('title', actionLabel);
