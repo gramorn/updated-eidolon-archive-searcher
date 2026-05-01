@@ -1123,7 +1123,7 @@ function Build-PageHtml {
     [void]$sb.AppendLine("      <h3 id=`"holyChestGuideTitle`">Holy Chest</h3>")
     [void]$sb.AppendLine("      <h4>Holy Chest Tips</h4>")
     [void]$sb.AppendLine("      <p>The Holy Chest is a system where you can slot up to <strong>9 gold weapons</strong>. The higher their fortification level, the stronger the bonuses you receive. Each weapon has its own Holy Chest bonus, which can be viewed by pressing <strong>TAB</strong> on the weapon's details.</p>")
-    [void]$sb.AppendLine("      <p>The Holy Chest is <strong>shared across all characters on your account</strong>, but the bonuses only apply to characters whose level is <strong>equal to or lower than the weapon level</strong> inside the chest. This is why using <strong>Lv95 Abyss II weapons</strong> is recommended — they cover all current endgame characters.</p>")
+    [void]$sb.AppendLine("      <p>The Holy Chest is <strong>shared across all characters on your account</strong>, but the bonuses only apply to characters whose level is <strong>equal to or higher than the weapon level</strong> inside the chest. This is why using <strong>Lv95 Abyss II weapons</strong> is recommended — they cover all current endgame characters.</p>")
     [void]$sb.AppendLine("      <ul>")
     [void]$sb.AppendLine("        <li><strong>Early goal — +15:</strong> Fortify your weapons to at least +15 to unlock the <strong>Dragon Points bonus</strong> and, for Abyss II weapons, the full elemental damage bonus.</li>")
     [void]$sb.AppendLine("        <li><strong>Final goal — +30:</strong> Reach +30 on all 9 weapons to unlock every bonus, including <strong>elemental penetration</strong> on Abyss II weapons.</li>")
