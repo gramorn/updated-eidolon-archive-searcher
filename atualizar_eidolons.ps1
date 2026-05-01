@@ -1,4 +1,4 @@
-param(
+﻿param(
     [string]$Url = "https://www.aurakingdom-db.com/charts/eidolon-archive",
     [string]$OutputHtml = "index.html",
     [string]$AssetsDir = "assets/eidolons",
@@ -47,7 +47,7 @@ function Normalize-EidolonName {
     }
 
     $map = @{
-        "H?ur" = "H�dur"
+        "H?ur" = "Höður"
     }
 
     if ($map.ContainsKey($Name)) {
@@ -1019,10 +1019,10 @@ function Build-PageHtml {
     [void]$sb.AppendLine("        </details>")
     [void]$sb.AppendLine("        <div class='lang-selector' role='group' aria-label='Language'>")
     [void]$sb.AppendLine("          <button class='lang-btn active' data-lang='en' title='English' type='button'><img src='https://flagcdn.com/20x15/us.png' alt='English' width='20' height='15'/></button>")
-    [void]$sb.AppendLine("          <button class='lang-btn' data-lang='pt' title='Portugu�s (Brasil)' type='button'><img src='https://flagcdn.com/20x15/br.png' alt='Portugu�s' width='20' height='15'/></button>")
-    [void]$sb.AppendLine("          <button class='lang-btn' data-lang='es' title='Espa�ol' type='button'><img src='https://flagcdn.com/20x15/es.png' alt='Espa�ol' width='20' height='15'/></button>")
+    [void]$sb.AppendLine("          <button class='lang-btn' data-lang='pt' title='Português (Brasil)' type='button'><img src='https://flagcdn.com/20x15/br.png' alt='Português' width='20' height='15'/></button>")
+    [void]$sb.AppendLine("          <button class='lang-btn' data-lang='es' title='Español' type='button'><img src='https://flagcdn.com/20x15/es.png' alt='Español' width='20' height='15'/></button>")
     [void]$sb.AppendLine("          <button class='lang-btn' data-lang='de' title='Deutsch' type='button'><img src='https://flagcdn.com/20x15/de.png' alt='Deutsch' width='20' height='15'/></button>")
-    [void]$sb.AppendLine("          <button class='lang-btn' data-lang='fr' title='Fran�ais' type='button'><img src='https://flagcdn.com/20x15/fr.png' alt='Fran�ais' width='20' height='15'/></button>")
+    [void]$sb.AppendLine("          <button class='lang-btn' data-lang='fr' title='Français' type='button'><img src='https://flagcdn.com/20x15/fr.png' alt='Français' width='20' height='15'/></button>")
     [void]$sb.AppendLine("        </div>")
     [void]$sb.AppendLine("        <button id=`"aboutInfoBtn`" class=`"boost-guide-btn`" type=`"button`" title=`"About this project`" aria-label=`"About this project`">About</button>")
     [void]$sb.AppendLine("        <button id=`"themeToggle`" class=`"theme-toggle`" type=`"button`" aria-label=`"Switch to light theme`" title=`"Switch to light theme`"><span id=`"themeIcon`" class=`"theme-icon`"></span></button>")
@@ -1096,9 +1096,9 @@ function Build-PageHtml {
     [void]$sb.AppendLine("      <p>Reaching level 10 unlocks the card's <strong>Status Bonus</strong>, applied permanently to your character.</p>")
     [void]$sb.AppendLine("      <p>Device tier required per level:</p>")
     [void]$sb.AppendLine("      <ul class=`"limit-break-list`">")
-    [void]$sb.AppendLine("        <li>Levels 1�3: Basic Card Breakthrough Device</li>")
-    [void]$sb.AppendLine("        <li>Levels 4�7: Intermediate Card Breakthrough Device</li>")
-    [void]$sb.AppendLine("        <li>Levels 7�10: Advanced Card Breakthrough Device</li>")
+    [void]$sb.AppendLine("        <li>Levels 1–3: Basic Card Breakthrough Device</li>")
+    [void]$sb.AppendLine("        <li>Levels 4–7: Intermediate Card Breakthrough Device</li>")
+    [void]$sb.AppendLine("        <li>Levels 7–10: Advanced Card Breakthrough Device</li>")
     [void]$sb.AppendLine("      </ul>")
     [void]$sb.AppendLine("      <p>Current maximum status gains available from cards (full breakthrough) are shown below:</p>")
     [void]$sb.AppendLine("      <div class=`"boost-source-wrap`">")
@@ -1123,13 +1123,13 @@ function Build-PageHtml {
     [void]$sb.AppendLine("      <h3 id=`"holyChestGuideTitle`">Holy Chest</h3>")
     [void]$sb.AppendLine("      <h4>Holy Chest Tips</h4>")
     [void]$sb.AppendLine("      <p>The Holy Chest is a system where you can slot up to <strong>9 gold weapons</strong>. The higher their fortification level, the stronger the bonuses you receive. Each weapon has its own Holy Chest bonus, which can be viewed by pressing <strong>TAB</strong> on the weapon's details.</p>")
-    [void]$sb.AppendLine("      <p>The Holy Chest is <strong>shared across all characters on your account</strong>, but the bonuses only apply to characters whose level is <strong>equal to or lower than the weapon level</strong> inside the chest. This is why using <strong>Lv95 Abyss II weapons</strong> is recommended � they cover all current endgame characters.</p>")
+    [void]$sb.AppendLine("      <p>The Holy Chest is <strong>shared across all characters on your account</strong>, but the bonuses only apply to characters whose level is <strong>equal to or lower than the weapon level</strong> inside the chest. This is why using <strong>Lv95 Abyss II weapons</strong> is recommended — they cover all current endgame characters.</p>")
     [void]$sb.AppendLine("      <ul>")
-    [void]$sb.AppendLine("        <li><strong>Early goal � +15:</strong> Fortify your weapons to at least +15 to unlock the <strong>Dragon Points bonus</strong> and, for Abyss II weapons, the full elemental damage bonus.</li>")
-    [void]$sb.AppendLine("        <li><strong>Final goal � +30:</strong> Reach +30 on all 9 weapons to unlock every bonus, including <strong>elemental penetration</strong> on Abyss II weapons.</li>")
+    [void]$sb.AppendLine("        <li><strong>Early goal — +15:</strong> Fortify your weapons to at least +15 to unlock the <strong>Dragon Points bonus</strong> and, for Abyss II weapons, the full elemental damage bonus.</li>")
+    [void]$sb.AppendLine("        <li><strong>Final goal — +30:</strong> Reach +30 on all 9 weapons to unlock every bonus, including <strong>elemental penetration</strong> on Abyss II weapons.</li>")
     [void]$sb.AppendLine("        <li><strong>Best weapons to use:</strong> Lv95 Abyss II weapons (Hebe, Cerberus, Izanami, Michaela, Demeter, Hermes). They provide the highest bonuses at both +15 and +30.</li>")
     [void]$sb.AppendLine("        <li><strong>Best source of elemental damage:</strong> Each weapon gives up to <strong>17% damage against a specific element</strong>, for a maximum of <strong>153% elemental damage</strong> across all 9 slots.</li>")
-    [void]$sb.AppendLine("        <li><strong>Priority elements:</strong> Focus on <strong>Dark, Lightning, Storm, and Ice</strong> � these are the main elements needed for Vault of Eternity (floors 8�12, party).</li>")
+    [void]$sb.AppendLine("        <li><strong>Priority elements:</strong> Focus on <strong>Dark, Lightning, Storm, and Ice</strong> — these are the main elements needed for Vault of Eternity (floors 8–12, party).</li>")
     [void]$sb.AppendLine("      </ul>")
     [void]$sb.AppendLine("      <h4>Awakening Holy Chest</h4>")
     [void]$sb.AppendLine("      <p>This table shows the success percentage for upgrading the AHC level for different gold weapon levels. The higher the weapon level, the less fortification is needed to achieve a higher success percentage.</p>")
@@ -1266,21 +1266,21 @@ function Build-PageHtml {
     [void]$sb.AppendLine("        <h4>Weapon Secret Stone</h4>")
     [void]$sb.AppendLine("        <p class=`"gear-guide-note`">Always get the secret stone for your class skill.</p>")
     [void]$sb.AppendLine("        <ul class=`"gear-guide-list`">")
-    [void]$sb.AppendLine("          <li><strong>Piercing Secret Stone</strong> � Best in slot, but expensive.</li>")
-    [void]$sb.AppendLine("          <li><strong>Lava Secret Stone</strong> � Cheaper than Piercing, and can be farmed in Pyroclastic Purgatory.</li>")
-    [void]$sb.AppendLine("          <li><strong>Orange Class Master Stone</strong> � Use as a placeholder before getting Lava or better.</li>")
+    [void]$sb.AppendLine("          <li><strong>Piercing Secret Stone</strong> — Best in slot, but expensive.</li>")
+    [void]$sb.AppendLine("          <li><strong>Lava Secret Stone</strong> — Cheaper than Piercing, and can be farmed in Pyroclastic Purgatory.</li>")
+    [void]$sb.AppendLine("          <li><strong>Orange Class Master Stone</strong> — Use as a placeholder before getting Lava or better.</li>")
     [void]$sb.AppendLine("        </ul>")
     [void]$sb.AppendLine("      </div>")
     [void]$sb.AppendLine("      <div class=`"gear-guide-box`">")
     [void]$sb.AppendLine("        <h4>Armor Secret Stone</h4>")
-    [void]$sb.AppendLine("        <p class=`"gear-guide-note`">Purchase them at your class Master in Navea. They will be orange � don't worry about the stats. Level them to 70, then upgrade to purple to add one more stat, and they are ready to reroll.</p>")
+    [void]$sb.AppendLine("        <p class=`"gear-guide-note`">Purchase them at your class Master in Navea. They will be orange — don't worry about the stats. Level them to 70, then upgrade to purple to add one more stat, and they are ready to reroll.</p>")
     [void]$sb.AppendLine("        <h5>Best Stats to Aim For (Rerolling)</h5>")
     [void]$sb.AppendLine("        <ul class=`"gear-guide-list`">")
     [void]$sb.AppendLine("          <li><strong>Detail-DMG</strong> (or DMG): +5 / +4 / +3</li>")
     [void]$sb.AppendLine("          <li><strong>CRIT DMG:</strong> +10 / +8 / +6</li>")
     [void]$sb.AppendLine("        </ul>")
     [void]$sb.AppendLine("        <p class=`"gear-guide-note`">Always aim for <strong>Detail-DMG +5%</strong> or at least <strong>DMG +4%</strong>. The most common strategy is to get <strong>Detail-DMG +5</strong> on the last line, then use a <strong>DMG + Something reroll potion</strong> to aim for double Detail-DMG on the stone.</p>")
-    [void]$sb.AppendLine("        <p class=`"gear-guide-note`">With enough economy, you can push further and get a stone with <strong>three damage stats</strong> � for example: <em>The DMG caused is increased by 6% / DMG +3% / Detail-DMG +5%</em>.</p>")
+    [void]$sb.AppendLine("        <p class=`"gear-guide-note`">With enough economy, you can push further and get a stone with <strong>three damage stats</strong> — for example: <em>The DMG caused is increased by 6% / DMG +3% / Detail-DMG +5%</em>.</p>")
     [void]$sb.AppendLine("      </div>")
     [void]$sb.AppendLine("      <div class=`"gear-guide-box`">")
     [void]$sb.AppendLine("        <h4>Costume</h4>")
@@ -1472,7 +1472,7 @@ function Build-PageHtml {
     [void]$sb.AppendLine("      <div class=`"best-eidolons-warning`"><strong>Outdated list:</strong> this information is from July 2024 and may no longer reflect the current best choices.</div>")
     [void]$sb.AppendLine("      <p class=`"best-eidolons-legend`"><span class='eido-sym'>&#9733;</span> = Great with Eidolon Symbol</p>")
     [void]$sb.AppendLine("      <div class=`"best-eidolons-grid`">")
-    [void]$sb.AppendLine("        <section class='best-eidolons-section'><h4>Universal Eidolons</h4><ul class='best-eidolons-list'><li><img class='best-eido-icon' src='assets/eidolons/P00146.png' alt='NY Queen of Hearts' loading='lazy'><span><strong>NY Queen of Hearts:</strong> Best DPS for any build. <span class='best-upgrade-tag'>all upgrades</span></span></li><li><img class='best-eido-icon' src='assets/eidolons/P00099.png' alt='Otohime' loading='lazy'><span><strong>Otohime:</strong> Top DPS with 10s zeal buff. <span class='best-upgrade-tag'>1st upgrade</span></span></li><li><img class='best-eido-icon' src='assets/eidolons/P00055.png' alt='Tyr' loading='lazy'><span><strong>Tyr:</strong> Best flat DEF shred for any class. <span class='best-upgrade-tag'>all upgrades</span></span></li><li><img class='best-eido-icon' src='assets/eidolons/P00096.png' alt='Persephone' loading='lazy'><span><strong>Persephone:</strong> 10s DMG &amp; debuff immunity � disable auto-skills and activate manually. <span class='best-upgrade-tag'>all upgrades</span></span></li><li><img class='best-eido-icon' src='assets/eidolons/P00138.png' alt='Da Qiao' loading='lazy'><span><strong>Da Qiao:</strong> Emergency party healing. <span class='best-upgrade-tag'>all upgrades</span></span></li><li><img class='best-eido-icon' src='assets/eidolons/P00066.png' alt='Eirene' loading='lazy'><span><strong>Eirene:</strong> Debuff cleanse + 4s DMG &amp; debuff immunity. <span class='best-upgrade-tag'>1st upgrade</span></span></li></ul></section>")
+    [void]$sb.AppendLine("        <section class='best-eidolons-section'><h4>Universal Eidolons</h4><ul class='best-eidolons-list'><li><img class='best-eido-icon' src='assets/eidolons/P00146.png' alt='NY Queen of Hearts' loading='lazy'><span><strong>NY Queen of Hearts:</strong> Best DPS for any build. <span class='best-upgrade-tag'>all upgrades</span></span></li><li><img class='best-eido-icon' src='assets/eidolons/P00099.png' alt='Otohime' loading='lazy'><span><strong>Otohime:</strong> Top DPS with 10s zeal buff. <span class='best-upgrade-tag'>1st upgrade</span></span></li><li><img class='best-eido-icon' src='assets/eidolons/P00055.png' alt='Tyr' loading='lazy'><span><strong>Tyr:</strong> Best flat DEF shred for any class. <span class='best-upgrade-tag'>all upgrades</span></span></li><li><img class='best-eido-icon' src='assets/eidolons/P00096.png' alt='Persephone' loading='lazy'><span><strong>Persephone:</strong> 10s DMG &amp; debuff immunity — disable auto-skills and activate manually. <span class='best-upgrade-tag'>all upgrades</span></span></li><li><img class='best-eido-icon' src='assets/eidolons/P00138.png' alt='Da Qiao' loading='lazy'><span><strong>Da Qiao:</strong> Emergency party healing. <span class='best-upgrade-tag'>all upgrades</span></span></li><li><img class='best-eido-icon' src='assets/eidolons/P00066.png' alt='Eirene' loading='lazy'><span><strong>Eirene:</strong> Debuff cleanse + 4s DMG &amp; debuff immunity. <span class='best-upgrade-tag'>1st upgrade</span></span></li></ul></section>")
     [void]$sb.AppendLine("        <section class='best-eidolons-section'><h4>Dark Eidolons</h4><ul class='best-eidolons-list'><li><img class='best-eido-icon' src='assets/eidolons/P00077.png' alt='NY Muramasa' loading='lazy'><span><strong>NY Muramasa<span class='eido-sym'>&#9733;</span>:</strong> Main DPS with 5s zeal buff. <span class='best-upgrade-tag'>2nd upgrade</span></span></li><li><img class='best-eido-icon' src='assets/eidolons/P00137.png' alt='Eris' loading='lazy'><span><strong>Eris<span class='eido-sym'>&#9733;</span>:</strong> Main DPS. <span class='best-upgrade-tag'>all upgrades</span></span></li><li><img class='best-eido-icon' src='assets/eidolons/P00068.png' alt='Hades' loading='lazy'><span><strong>Hades<span class='eido-sym'>&#9733;</span>:</strong> Main DPS + flat DEF shred. <span class='best-upgrade-tag'>all upgrades</span></span></li><li><img class='best-eido-icon' src='assets/eidolons/P00106.png' alt='NY Succubus' loading='lazy'><span><strong>NY Succubus:</strong> Flat DEF shred. <span class='best-upgrade-tag'>all upgrades</span></span></li><li><img class='best-eido-icon' src='assets/eidolons/P00062.png' alt='Muramasa' loading='lazy'><span><strong>Muramasa:</strong> Flat DEF shred. <span class='best-upgrade-tag'>2nd upgrade</span></span></li><li><img class='best-eido-icon' src='assets/eidolons/P00073.png' alt='Nidhogg' loading='lazy'><span><strong>Nidhogg<span class='eido-sym'>&#9733;</span>:</strong> Main DPS &ndash; no skill upgrades needed.</span></li></ul></section>")
     [void]$sb.AppendLine("        <section class='best-eidolons-section'><h4>Holy Eidolons</h4><ul class='best-eidolons-list'><li><img class='best-eido-icon' src='assets/eidolons/P00156.png' alt='Guan Yu' loading='lazy'><span><strong>Guan Yu<span class='eido-sym'>&#9733;</span>:</strong> Main DPS. <span class='best-upgrade-tag'>1st upgrade</span></span></li><li><img class='best-eido-icon' src='assets/eidolons/P00140.png' alt='Gaia' loading='lazy'><span><strong>Gaia<span class='eido-sym'>&#9733;</span>:</strong> Main DPS. <span class='best-upgrade-tag'>2nd upgrade</span></span></li><li><img class='best-eido-icon' src='assets/eidolons/P00098.png' alt='Summer Michaela' loading='lazy'><span><strong>Summer Michaela<span class='eido-sym'>&#9733;</span>:</strong> Main DPS. <span class='best-upgrade-tag'>1st upgrade</span></span></li><li><img class='best-eido-icon' src='assets/eidolons/P00144.png' alt='Christmas Andrea' loading='lazy'><span><strong>Christmas Andrea:</strong> Main DPS. <span class='best-upgrade-tag'>all upgrades</span></span></li><li><img class='best-eido-icon' src='assets/eidolons/P00072.png' alt='Idunn' loading='lazy'><span><strong>Idunn:</strong> Flat DEF shred + 8s debuff immunity. <span class='best-upgrade-tag'>2nd upgrade</span></span></li><li><img class='best-eido-icon' src='assets/eidolons/P00045.png' alt='Alice' loading='lazy'><span><strong>Alice:</strong> Flat DEF shred. <span class='best-upgrade-tag'>1st upgrade</span></span></li></ul></section>")
     [void]$sb.AppendLine("        <section class='best-eidolons-section'><h4>Flame Eidolons</h4><ul class='best-eidolons-list'><li><img class='best-eido-icon' src='assets/eidolons/P00146.png' alt='NY Queen of Hearts' loading='lazy'><span><strong>NY Queen of Hearts:</strong> Main DPS with 8s zeal buff. <span class='best-upgrade-tag'>all upgrades</span></span></li><li><img class='best-eido-icon' src='assets/eidolons/P00162.png' alt='Cinderella' loading='lazy'><span><strong>Cinderella:</strong> Flat DEF shred + debuff removal. <span class='best-upgrade-tag'>all upgrades</span></span></li><li><img class='best-eido-icon' src='assets/eidolons/P00151.png' alt='Liu Bei' loading='lazy'><span><strong>Liu Bei<span class='eido-sym'>&#9733;</span>:</strong> Main DPS. <span class='best-upgrade-tag'>1st upgrade</span></span></li><li><img class='best-eido-icon' src='assets/eidolons/P00120.png' alt='NY Elizabeth' loading='lazy'><span><strong>NY Elizabeth:</strong> Main DPS. <span class='best-upgrade-tag'>all upgrades</span></span></li><li><img class='best-eido-icon' src='assets/eidolons/P00142.png' alt='Anubis' loading='lazy'><span><strong>Anubis<span class='eido-sym'>&#9733;</span>:</strong> Main DPS. <span class='best-upgrade-tag'>1st upgrade</span></span></li><li><img class='best-eido-icon' src='assets/eidolons/P00121.png' alt='Little Red Riding Hood' loading='lazy'><span><strong>Little Red Riding Hood<span class='eido-sym'>&#9733;</span>:</strong> Flat DEF shred. <span class='best-upgrade-tag'>1st upgrade</span></span></li><li><img class='best-eido-icon' src='assets/eidolons/P00087.png' alt='Halloween Zashi' loading='lazy'><span><strong>Halloween Zashi<span class='eido-sym'>&#9733;</span>:</strong> Main DPS &ndash; no skill upgrades needed.</span></li></ul></section>")
@@ -1626,8 +1626,8 @@ function Build-PageHtml {
     [void]$sb.AppendLine("      document.body.setAttribute('data-theme', t);")
     [void]$sb.AppendLine("      document.body.style.backgroundColor = (t === 'dark') ? '#0f141d' : '#fff6ef';")
     [void]$sb.AppendLine("      themeIcon.innerHTML = (t === 'dark')")
-    [void]$sb.AppendLine("        ? '<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"white\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"5\"/><g stroke=\"white\" stroke-width=\"2\" stroke-linecap=\"round\"><line x1=\"12\" y1=\"2\" x2=\"12\" y2=\"5\"/><line x1=\"12\" y1=\"19\" x2=\"12\" y2=\"22\"/><line x1=\"2\" y1=\"12\" x2=\"5\" y2=\"12\"/><line x1=\"19\" y1=\"12\" x2=\"22\" y2=\"12\"/><line x1=\"4.22\" y1=\"4.22\" x2=\"6.34\" y2=\"6.34\"/><line x1=\"17.66\" y1=\"17.66\" x2=\"19.78\" y2=\"19.78\"/><line x1=\"19.78\" y1=\"4.22\" x2=\"17.66\" y2=\"6.34\"/><line x1=\"6.34\" y1=\"17.66\" x2=\"4.22\" y2=\"19.78\"/></g></svg>'")
-    [void]$sb.AppendLine("        : '<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"black\" aria-hidden=\"true\"><path d=\"M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z\"/></svg>';")
+    [void]$sb.AppendLine("        ? '<svg xmlns=`"http://www.w3.org/2000/svg`" viewBox=`"0 0 24 24`" fill=`"white`" aria-hidden=`"true`"><circle cx=`"12`" cy=`"12`" r=`"5`"/><g stroke=`"white`" stroke-width=`"2`" stroke-linecap=`"round`"><line x1=`"12`" y1=`"2`" x2=`"12`" y2=`"5`"/><line x1=`"12`" y1=`"19`" x2=`"12`" y2=`"22`"/><line x1=`"2`" y1=`"12`" x2=`"5`" y2=`"12`"/><line x1=`"19`" y1=`"12`" x2=`"22`" y2=`"12`"/><line x1=`"4.22`" y1=`"4.22`" x2=`"6.34`" y2=`"6.34`"/><line x1=`"17.66`" y1=`"17.66`" x2=`"19.78`" y2=`"19.78`"/><line x1=`"19.78`" y1=`"4.22`" x2=`"17.66`" y2=`"6.34`"/><line x1=`"6.34`" y1=`"17.66`" x2=`"4.22`" y2=`"19.78`"/></g></svg>'")
+    [void]$sb.AppendLine("        : '<svg xmlns=`"http://www.w3.org/2000/svg`" viewBox=`"0 0 24 24`" fill=`"black`" aria-hidden=`"true`"><path d=`"M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z`"/></svg>';")
     [void]$sb.AppendLine("      const actionLabel = (t === 'dark') ? 'Switch to light theme' : 'Switch to dark theme';")
     [void]$sb.AppendLine("      themeToggle.setAttribute('aria-label', actionLabel);")
     [void]$sb.AppendLine("      themeToggle.setAttribute('title', actionLabel);")
