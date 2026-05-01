@@ -285,7 +285,7 @@
           <button class='lang-btn' data-lang='fr' title='Franï¿½ais' type='button'><img src='https://flagcdn.com/20x15/fr.png' alt='Franï¿½ais' width='20' height='15'/></button>
         </div>
         <button id="aboutInfoBtn" class="boost-guide-btn" type="button" title="About this project" aria-label="About this project">About</button>
-        <button id="themeToggle" class="theme-toggle" type="button" aria-label="Switch to light theme" title="Switch to light theme"><span id="themeIcon" class="theme-icon">?</span></button>
+        <button id="themeToggle" class="theme-toggle" type="button" aria-label="Switch to light theme" title="Switch to light theme"><span id="themeIcon" class="theme-icon">&#x2600;&#xFE0F;</span></button>
       </div>
     </div>
     <input id="q" class="search" placeholder="Search by Eidolon, combo or bonus..." data-i18n-placeholder="search_placeholder" title="Type to filter combos by Eidolon, combo, or bonus" aria-label="Search combos">
@@ -2105,7 +2105,7 @@
       const t = (theme === 'light') ? 'light' : 'dark';
       document.body.setAttribute('data-theme', t);
       document.body.style.backgroundColor = (t === 'dark') ? '#0f141d' : '#fff6ef';
-      themeIcon.textContent = (t === 'dark') ? '?' : '?';
+      themeIcon.textContent = (t === 'dark') ? '☀️' : '🌙';
       const actionLabel = (t === 'dark') ? 'Switch to light theme' : 'Switch to dark theme';
       themeToggle.setAttribute('aria-label', actionLabel);
       themeToggle.setAttribute('title', actionLabel);
