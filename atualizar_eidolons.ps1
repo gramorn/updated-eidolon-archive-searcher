@@ -2,6 +2,7 @@
     [string]$Url = "https://www.aurakingdom-db.com/charts/eidolon-archive",
     [string]$OutputHtml = "index.html",
     [string]$AssetsDir = "assets/eidolons",
+    [string]$StarsTemplatePath = "assets/eidolon-stars-template.xlsx",
     [switch]$KeepRemoteIcons
 )
 
@@ -47,7 +48,9 @@ function Normalize-EidolonName {
     }
 
     $map = @{
-        "H?ur" = "Höður"
+        "H?ur" = "Hödur"
+        "H鐰ur" = "Hödur"
+        "Höður" = "Hödur"
     }
 
     if ($map.ContainsKey($Name)) {
@@ -119,6 +122,177 @@ function Get-Local-Icon {
     }
 
     return $RemoteUrl
+}
+
+function Set-ZipTextContent {
+        param(
+                [System.IO.Compression.ZipArchive]$Archive,
+                [string]$EntryName,
+                [string]$Content
+        )
+
+        $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+        $entry = $Archive.CreateEntry($EntryName, [System.IO.Compression.CompressionLevel]::Optimal)
+        $stream = $entry.Open()
+        $writer = New-Object System.IO.StreamWriter($stream, $utf8NoBom)
+
+        try {
+                $writer.Write($Content)
+        } finally {
+                $writer.Dispose()
+                $stream.Dispose()
+        }
+}
+
+function New-EidolonStarsTemplateFile {
+        param(
+                [string[]]$KnownEidolonNames,
+                [string]$OutputPath
+        )
+
+        Add-Type -AssemblyName System.IO.Compression
+        Add-Type -AssemblyName System.IO.Compression.FileSystem
+
+        $sheetRows = New-Object System.Collections.Generic.List[string]
+        $sheetRows.Add('<row r="1"><c r="A1" t="inlineStr"><is><t>Eidolon</t></is></c><c r="B1" t="inlineStr"><is><t>Stars (0-4)</t></is></c></row>')
+
+        $rowNumber = 2
+        foreach ($name in $KnownEidolonNames) {
+                $escapedName = [System.Security.SecurityElement]::Escape($name)
+            $sheetRows.Add(('<row r="{0}"><c r="A{0}" t="inlineStr"><is><t xml:space="preserve">{1}</t></is></c><c r="B{0}"><v>0</v></c></row>' -f $rowNumber, $escapedName))
+                $rowNumber++
+        }
+
+        $lastRow = [Math]::Max($rowNumber - 1, 1)
+        $sheetXml = @"
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+    <dimension ref="A1:B$lastRow"/>
+    <sheetViews>
+        <sheetView workbookViewId="0">
+            <pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/>
+            <selection pane="bottomLeft" activeCell="A2" sqref="A2"/>
+        </sheetView>
+    </sheetViews>
+    <sheetFormatPr defaultRowHeight="15"/>
+    <cols>
+        <col min="1" max="1" width="28" customWidth="1"/>
+        <col min="2" max="2" width="14" customWidth="1"/>
+    </cols>
+    <sheetData>
+        $($sheetRows -join [Environment]::NewLine)
+    </sheetData>
+</worksheet>
+"@
+
+        $contentTypesXml = @"
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+    <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+    <Default Extension="xml" ContentType="application/xml"/>
+    <Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>
+    <Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>
+    <Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>
+    <Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/>
+    <Override PartName="/docProps/app.xml" ContentType="application/vnd.openxmlformats-officedocument.extended-properties+xml"/>
+</Types>
+"@
+
+        $relsXml = @"
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+    <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>
+    <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/>
+    <Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/extended-properties" Target="docProps/app.xml"/>
+</Relationships>
+"@
+
+        $workbookXml = @"
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+    <sheets>
+        <sheet name="Eidolon Stars" sheetId="1" r:id="rId1"/>
+    </sheets>
+</workbook>
+"@
+
+        $workbookRelsXml = @"
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+    <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/>
+    <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>
+</Relationships>
+"@
+
+        $stylesXml = @"
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+    <fonts count="1"><font><sz val="11"/><name val="Calibri"/></font></fonts>
+    <fills count="2"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill></fills>
+    <borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders>
+    <cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>
+    <cellXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/></cellXfs>
+    <cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles>
+</styleSheet>
+"@
+
+        $timestamp = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
+        $coreXml = @"
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dcmitype="http://purl.org/dc/dcmitype/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <dc:title>Eidolon Stars Template</dc:title>
+    <dc:creator>Aura Kingdom Eidolon Archive</dc:creator>
+    <cp:lastModifiedBy>Aura Kingdom Eidolon Archive</cp:lastModifiedBy>
+    <dcterms:created xsi:type="dcterms:W3CDTF">$timestamp</dcterms:created>
+    <dcterms:modified xsi:type="dcterms:W3CDTF">$timestamp</dcterms:modified>
+</cp:coreProperties>
+"@
+
+        $appXml = @"
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties" xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes">
+    <Application>Microsoft Excel</Application>
+    <DocSecurity>0</DocSecurity>
+    <ScaleCrop>false</ScaleCrop>
+    <HeadingPairs>
+        <vt:vector size="2" baseType="variant">
+            <vt:variant><vt:lpstr>Worksheets</vt:lpstr></vt:variant>
+            <vt:variant><vt:i4>1</vt:i4></vt:variant>
+        </vt:vector>
+    </HeadingPairs>
+    <TitlesOfParts>
+        <vt:vector size="1" baseType="lpstr">
+            <vt:lpstr>Eidolon Stars</vt:lpstr>
+        </vt:vector>
+    </TitlesOfParts>
+</Properties>
+"@
+
+        $outputDir = Split-Path -Path $OutputPath -Parent
+        if ($outputDir) {
+                New-Item -Path $outputDir -ItemType Directory -Force | Out-Null
+        }
+
+        if (Test-Path $OutputPath) {
+                Remove-Item -Path $OutputPath -Force
+        }
+
+        $fileStream = [System.IO.File]::Open($OutputPath, [System.IO.FileMode]::CreateNew)
+        $archive = New-Object System.IO.Compression.ZipArchive($fileStream, [System.IO.Compression.ZipArchiveMode]::Create, $false)
+
+        try {
+                Set-ZipTextContent -Archive $archive -EntryName "[Content_Types].xml" -Content $contentTypesXml
+                Set-ZipTextContent -Archive $archive -EntryName "_rels/.rels" -Content $relsXml
+                Set-ZipTextContent -Archive $archive -EntryName "docProps/core.xml" -Content $coreXml
+                Set-ZipTextContent -Archive $archive -EntryName "docProps/app.xml" -Content $appXml
+                Set-ZipTextContent -Archive $archive -EntryName "xl/workbook.xml" -Content $workbookXml
+                Set-ZipTextContent -Archive $archive -EntryName "xl/_rels/workbook.xml.rels" -Content $workbookRelsXml
+                Set-ZipTextContent -Archive $archive -EntryName "xl/styles.xml" -Content $stylesXml
+                Set-ZipTextContent -Archive $archive -EntryName "xl/worksheets/sheet1.xml" -Content $sheetXml
+        } finally {
+                $archive.Dispose()
+                $fileStream.Dispose()
+        }
 }
 
 function Get-EidolonWishStatsTotals {
@@ -656,7 +830,9 @@ function Build-PageHtml {
         [hashtable]$IconMap,
         [array]$DungeonGuideItems,
         [array]$WishStatsTotals,
-        [pscustomobject]$LuckyPackTotals
+        [pscustomobject]$LuckyPackTotals,
+        [string[]]$KnownEidolonNames,
+        [string]$StarsTemplatePath
     )
 
     $dungeonGuideIconMap = @{}
@@ -735,6 +911,9 @@ function Build-PageHtml {
         }
     }
 
+    $knownEidolonsJson = (@($KnownEidolonNames) | ConvertTo-Json -Compress)
+    $safeTemplatePath = [System.Web.HttpUtility]::HtmlEncode(($StarsTemplatePath -replace "\\", "/"))
+
     $sb = New-Object System.Text.StringBuilder
 
     [void]$sb.AppendLine("<!doctype html>")
@@ -752,6 +931,7 @@ function Build-PageHtml {
     [void]$sb.AppendLine("  <meta name=`"viewport`" content=`"width=device-width, initial-scale=1`">")
     [void]$sb.AppendLine("  <meta name=`"google`" content=`"notranslate`">")
     [void]$sb.AppendLine("  <title>Eidolon Archive</title>")
+    [void]$sb.AppendLine("  <script src=`"https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js`"></script>")
     [void]$sb.AppendLine("  <style>")
     [void]$sb.AppendLine("    :root { --bg:#0f141d; --bg-top:#1a2230; --card:#161e2a; --ink:#e8edf5; --muted:#9aa8bc; --line:#2a3446; --accent:#7cc8ff; --th-bg:#1c2736; --chip-bg:#202b3b; --chip-line:#33455f; --icon-bg:#101722; --icon-line:#3a4d69; --input-bg:#121a26; --input-ink:#e8edf5; }")
     [void]$sb.AppendLine("    body[data-theme='light'] { --bg:#fff6ef; --bg-top:#fffdf8; --card:#fffdf9; --ink:#2d1f1a; --muted:#6c5a53; --line:#efddd3; --accent:#cc5f2e; --th-bg:#fff4ec; --chip-bg:#fff7f1; --chip-line:#f0dfd5; --icon-bg:#ffffff; --icon-line:#e8d3c7; --input-bg:#ffffff; --input-ink:#2d1f1a; }")
@@ -764,6 +944,34 @@ function Build-PageHtml {
     [void]$sb.AppendLine("    .search { width:100%; border:1px solid var(--line); border-radius:10px; padding:6px 10px; font-size:0.9rem; background:var(--input-bg); color:var(--input-ink); }")
     [void]$sb.AppendLine("    .section { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:12px; margin-top:14px; box-shadow:0 8px 22px rgba(0,0,0,.28); overflow-x:auto; }")
     [void]$sb.AppendLine("    .section h2 { margin:0 0 10px; color:var(--accent); font-size:1.05rem; letter-spacing:.2px; }")
+    [void]$sb.AppendLine("    .stats-calculator { display:grid; gap:12px; }")
+    [void]$sb.AppendLine("    .stats-calculator-intro { display:grid; gap:6px; }")
+    [void]$sb.AppendLine("    .stats-calculator-actions { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }")
+    [void]$sb.AppendLine("    .stats-template-link, .stats-upload-label { height:40px; border-radius:10px; border:1px solid var(--line); background:var(--card); display:inline-flex; align-items:center; justify-content:center; cursor:pointer; padding:0 12px; color:var(--ink); font-size:0.82rem; font-weight:700; text-decoration:none; }")
+    [void]$sb.AppendLine("    .stats-template-link:hover, .stats-upload-label:hover { border-color:var(--accent); }")
+    [void]$sb.AppendLine("    .stats-upload-input { display:none; }")
+    [void]$sb.AppendLine("    .stats-import-status { border:1px dashed var(--line); border-radius:10px; padding:12px; background:var(--chip-bg); }")
+    [void]$sb.AppendLine("    .stats-summary { display:grid; grid-template-columns:repeat(auto-fit, minmax(110px, 1fr)); gap:8px; margin-top:10px; }")
+    [void]$sb.AppendLine("    .stats-summary-card { border:1px solid var(--line); border-radius:10px; background:var(--card); padding:10px; }")
+    [void]$sb.AppendLine("    .stats-summary-card strong { display:block; color:var(--ink); font-size:1rem; margin-bottom:4px; }")
+    [void]$sb.AppendLine("    .stats-summary-card span { color:var(--muted); font-size:0.78rem; }")
+    [void]$sb.AppendLine("    .stats-errors { margin:10px 0 0; padding-left:18px; color:var(--muted); max-height:160px; overflow:auto; }")
+    [void]$sb.AppendLine("    .stats-errors li { margin:4px 0; }")
+    [void]$sb.AppendLine("    .stats-calculated { margin-top:10px; border:1px solid var(--line); border-radius:10px; background:var(--card); padding:10px; display:grid; gap:8px; }")
+    [void]$sb.AppendLine("    .stats-calculated h4 { margin:0; color:var(--accent); font-size:0.9rem; }")
+    [void]$sb.AppendLine("    .stats-calculated-summary { display:flex; flex-wrap:wrap; gap:10px; color:var(--muted); font-size:0.8rem; }")
+    [void]$sb.AppendLine("    .stats-calculated-table { width:100%; border-collapse:collapse; font-size:0.82rem; }")
+    [void]$sb.AppendLine("    .stats-calculated-table th, .stats-calculated-table td { border:1px solid var(--line); padding:7px 8px; }")
+    [void]$sb.AppendLine("    .stats-calculated-table th { background:var(--th-bg); color:var(--ink); }")
+    [void]$sb.AppendLine("    .stats-calculated-empty { color:var(--muted); font-size:0.8rem; }")
+    [void]$sb.AppendLine("    .stats-routes { margin-top:10px; border:1px solid var(--line); border-radius:10px; background:var(--card); padding:10px; display:grid; gap:8px; }")
+    [void]$sb.AppendLine("    .stats-routes h4 { margin:0; color:var(--accent); font-size:0.9rem; }")
+    [void]$sb.AppendLine("    .stats-routes-list { display:grid; gap:8px; }")
+    [void]$sb.AppendLine("    .stats-route-item { border:1px solid var(--line); border-radius:10px; background:var(--chip-bg); padding:8px; display:grid; gap:4px; }")
+    [void]$sb.AppendLine("    .stats-route-item strong { color:var(--ink); }")
+    [void]$sb.AppendLine("    .stats-route-meta { color:var(--muted); font-size:0.78rem; }")
+    [void]$sb.AppendLine("    .stats-route-steps { color:var(--ink); font-size:0.8rem; }")
+    [void]$sb.AppendLine("    .stats-route-empty { color:var(--muted); font-size:0.8rem; }")
     [void]$sb.AppendLine("    table { width:100%; border-collapse: collapse; font-size:0.9rem; }")
     [void]$sb.AppendLine("    th, td { border:1px solid var(--line); padding:8px; vertical-align:top; text-align:left; }")
     [void]$sb.AppendLine("    th { background:var(--th-bg); }")
@@ -782,13 +990,20 @@ function Build-PageHtml {
     [void]$sb.AppendLine("    .info-menu-toggle::-webkit-details-marker { display:none; }")
     [void]$sb.AppendLine("    .info-menu-panel { position:absolute; right:0; top:46px; width:min(340px, 90vw); padding:10px; border:1px solid var(--line); border-radius:12px; background:var(--card); box-shadow:0 14px 30px rgba(0,0,0,.35); display:none; z-index:25; }")
     [void]$sb.AppendLine("    .info-menu[open] .info-menu-panel { display:grid; gap:8px; }")
-    [void]$sb.AppendLine("    .info-menu-panel .lucky-pack-btn, .info-menu-panel .wish-coin-btn, .info-menu-panel .limit-break-btn, .info-menu-panel .dungeon-guide-btn, .info-menu-panel .leveling-guide-btn, .info-menu-panel .boost-guide-btn, .info-menu-panel .best-eidolons-btn, .info-menu-panel .useful-links-btn { width:100%; justify-content:flex-start; }")
+    [void]$sb.AppendLine("    .info-menu-panel .lucky-pack-btn, .info-menu-panel .wish-coin-btn, .info-menu-panel .limit-break-btn, .info-menu-panel .dungeon-guide-btn, .info-menu-panel .leveling-guide-btn, .info-menu-panel .boost-guide-btn, .info-menu-panel .best-eidolons-btn, .info-menu-panel .useful-links-btn, .info-menu-panel .tools-menu-btn, .info-menu-panel .class-guides-trigger { width:100%; justify-content:flex-start; }")
     [void]$sb.AppendLine("    .best-eidolons-btn { height:40px; border-radius:10px; border:1px solid var(--line); background:var(--card); display:inline-flex; align-items:center; justify-content:flex-start; cursor:pointer; padding:0 10px; gap:6px; color:var(--ink); font-size:0.82rem; font-weight:600; }")
     [void]$sb.AppendLine("    .best-eidolons-btn:hover { border-color:var(--accent); }")
-    [void]$sb.AppendLine("    .class-guides-panel { max-height:min(70vh, 320px); overflow-y:auto; align-content:start; }")
+    [void]$sb.AppendLine("    .class-guides-item { position:relative; }")
+    [void]$sb.AppendLine("    .class-guides-trigger { height:40px; border-radius:10px; border:1px solid var(--line); background:var(--card); display:inline-flex; align-items:center; justify-content:flex-start; cursor:pointer; padding:0 10px; gap:6px; color:var(--ink); font-size:0.82rem; font-weight:600; }")
+    [void]$sb.AppendLine("    .class-guides-trigger:hover { border-color:var(--accent); }")
+    [void]$sb.AppendLine("    .class-guides-caret { margin-left:auto; font-size:0.7rem; opacity:0.8; }")
+    [void]$sb.AppendLine("    .class-guides-submenu { position:absolute; left:100%; top:0; width:min(320px, 84vw); max-height:min(70vh, 320px); overflow-y:auto; padding:8px; border:1px solid var(--line); border-radius:12px; background:var(--card); box-shadow:0 14px 30px rgba(0,0,0,.35); display:none; z-index:30; gap:8px; }")
+    [void]$sb.AppendLine("    .class-guides-item:hover .class-guides-submenu, .class-guides-item:focus-within .class-guides-submenu { display:grid; }")
     [void]$sb.AppendLine("    .class-guide-item { height:40px; border-radius:10px; border:1px solid var(--line); background:var(--chip-bg); display:inline-flex; align-items:center; justify-content:flex-start; padding:0 10px; color:var(--ink); font-size:0.82rem; font-weight:600; }")
     [void]$sb.AppendLine("    .useful-links-btn { height:40px; border-radius:10px; border:1px solid var(--line); background:var(--card); display:inline-flex; align-items:center; justify-content:flex-start; cursor:pointer; padding:0 10px; gap:6px; color:var(--ink); font-size:0.82rem; font-weight:600; }")
     [void]$sb.AppendLine("    .useful-links-btn:hover { border-color:var(--accent); }")
+    [void]$sb.AppendLine("    .tools-menu-btn { height:40px; border-radius:10px; border:1px solid var(--line); background:var(--card); display:inline-flex; align-items:center; justify-content:flex-start; cursor:pointer; padding:0 10px; gap:6px; color:var(--ink); font-size:0.82rem; font-weight:600; }")
+    [void]$sb.AppendLine("    .tools-menu-btn:hover { border-color:var(--accent); }")
     [void]$sb.AppendLine("    .lucky-pack-btn { height:40px; border-radius:10px; border:1px solid var(--line); background:var(--card); display:inline-flex; align-items:center; justify-content:center; cursor:pointer; padding:0 10px; gap:6px; color:var(--ink); font-size:0.82rem; font-weight:600; }")
     [void]$sb.AppendLine("    .lucky-pack-btn:hover { border-color:var(--accent); }")
     [void]$sb.AppendLine("    .lucky-pack-icon { width:24px; height:24px; border-radius:6px; object-fit:cover; }")
@@ -962,11 +1177,19 @@ function Build-PageHtml {
     [void]$sb.AppendLine("    .class-guide-actions { display:flex; justify-content:flex-end; margin-top:12px; }")
     [void]$sb.AppendLine("    .class-guide-close { height:36px; border-radius:10px; border:1px solid var(--line); background:var(--card); color:var(--ink); cursor:pointer; padding:0 14px; }")
     [void]$sb.AppendLine("    .class-guide-close:hover { border-color:var(--accent); }")
+    [void]$sb.AppendLine("    .stats-calculator-modal-backdrop { position:fixed; inset:0; background:rgba(3, 8, 18, 0.65); display:none; align-items:center; justify-content:center; z-index:80; padding:16px; }")
+    [void]$sb.AppendLine("    .stats-calculator-modal-backdrop.show { display:flex; }")
+    [void]$sb.AppendLine("    .stats-calculator-modal { width:min(760px, 96vw); max-height:90vh; overflow:auto; background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px; box-shadow:0 20px 48px rgba(0,0,0,.45); }")
+    [void]$sb.AppendLine("    .stats-calculator-modal h3 { margin:0 0 8px; font-size:1.02rem; color:var(--accent); }")
+    [void]$sb.AppendLine("    .stats-calculator-modal p { margin:0 0 8px; }")
+    [void]$sb.AppendLine("    .stats-calculator-close-wrap { display:flex; justify-content:flex-end; margin-top:12px; }")
+    [void]$sb.AppendLine("    .stats-calculator-close { height:36px; border-radius:10px; border:1px solid var(--line); background:var(--card); color:var(--ink); cursor:pointer; padding:0 14px; }")
+    [void]$sb.AppendLine("    .stats-calculator-close:hover { border-color:var(--accent); }")
     [void]$sb.AppendLine("    .guide-status { font-size:0.65rem; font-weight:700; border-radius:4px; padding:1px 5px; margin-left:auto; white-space:nowrap; }")
     [void]$sb.AppendLine("    .guide-status-soon { background:rgba(239,68,68,0.15); color:#f87171; }")
     [void]$sb.AppendLine("    .guide-status-wip { background:rgba(234,179,8,0.15); color:#facc15; }")
     [void]$sb.AppendLine("    .guide-status-done { background:rgba(34,197,94,0.15); color:#4ade80; }")
-    [void]$sb.AppendLine("    @media (max-width:760px) { .top-row { align-items:stretch; flex-direction:column; } .top-actions { width:100%; justify-content:flex-start; } .lucky-pack-btn, .wish-coin-btn, .limit-break-btn, .dungeon-guide-btn, .leveling-guide-btn, .gear-guide-btn, .boost-guide-btn, .best-eidolons-btn, .class-guide-item, .useful-links-btn { min-height:40px; padding:6px 10px; } .theme-toggle { flex:0 0 auto; } .info-menu-panel { position:static; width:100%; margin-top:8px; } .dungeon-guide-list { grid-template-columns:1fr; } .leveling-guide-list li { align-items:flex-start; flex-direction:column; } .skill-leveling-grid { grid-template-columns:1fr; } th, td { padding:7px 6px; font-size:0.84rem; } }")
+    [void]$sb.AppendLine("    @media (max-width:760px) { .top-row { align-items:stretch; flex-direction:column; } .top-actions { width:100%; justify-content:flex-start; } .lucky-pack-btn, .wish-coin-btn, .limit-break-btn, .dungeon-guide-btn, .leveling-guide-btn, .gear-guide-btn, .boost-guide-btn, .best-eidolons-btn, .class-guide-item, .class-guides-trigger, .useful-links-btn, .stats-template-link, .stats-upload-label { min-height:40px; padding:6px 10px; } .theme-toggle { flex:0 0 auto; } .info-menu-panel { position:static; width:100%; margin-top:8px; } .class-guides-submenu { position:static; left:auto; top:auto; width:100%; margin-top:8px; display:grid; } .class-guides-caret { transform:rotate(90deg); } .dungeon-guide-list { grid-template-columns:1fr; } .leveling-guide-list li { align-items:flex-start; flex-direction:column; } .skill-leveling-grid { grid-template-columns:1fr; } .stats-calculator-actions { align-items:stretch; flex-direction:column; } th, td { padding:7px 6px; font-size:0.84rem; } }")
     [void]$sb.AppendLine("  </style>")
     [void]$sb.AppendLine("</head>")
     [void]$sb.AppendLine("<body style=`"background-color:#0f141d`">")
@@ -979,6 +1202,31 @@ function Build-PageHtml {
     [void]$sb.AppendLine("        <details class=`"info-menu`">")
     [void]$sb.AppendLine("          <summary class=`"info-menu-toggle`" aria-label=`"Open info menu`" data-i18n=`"nav_guides`">Guides ?</summary>")
     [void]$sb.AppendLine("          <div class=`"info-menu-panel`">")
+    [void]$sb.AppendLine("            <div class='class-guides-item'>")
+    [void]$sb.AppendLine("              <button class='class-guides-trigger' type='button' data-i18n='btn_class_guides' aria-haspopup='true'>Class Guides <span class='class-guides-caret'>▸</span></button>")
+    [void]$sb.AppendLine("              <div class='class-guides-submenu' role='menu' aria-label='Class Guides'>")
+    [void]$sb.AppendLine("                <div class='class-guide-item'>Duelist <span class='guide-status guide-status-soon'>Soon</span></div>")
+    [void]$sb.AppendLine("                <div class='class-guide-item'>Guardian <span class='guide-status guide-status-soon'>Soon</span></div>")
+    [void]$sb.AppendLine("                <div class='class-guide-item'>Ravager <span class='guide-status guide-status-soon'>Soon</span></div>")
+    [void]$sb.AppendLine("                <div class='class-guide-item'>Wizard <span class='guide-status guide-status-soon'>Soon</span></div>")
+    [void]$sb.AppendLine("                <div class='class-guide-item'>Gunslinger <span class='guide-status guide-status-soon'>Soon</span></div>")
+    [void]$sb.AppendLine("                <div class='class-guide-item'>Grenadier <span class='guide-status guide-status-soon'>Soon</span></div>")
+    [void]$sb.AppendLine("                <div class='class-guide-item'>Sorcerer <span class='guide-status guide-status-soon'>Soon</span></div>")
+    [void]$sb.AppendLine("                <div class='class-guide-item'>Bard <span class='guide-status guide-status-soon'>Soon</span></div>")
+    [void]$sb.AppendLine("                <div class='class-guide-item'>Brawler <span class='guide-status guide-status-soon'>Soon</span></div>")
+    [void]$sb.AppendLine("                <div class='class-guide-item'>Ranger <span class='guide-status guide-status-soon'>Soon</span></div>")
+    [void]$sb.AppendLine("                <div class='class-guide-item'>Ronin <span class='guide-status guide-status-soon'>Soon</span></div>")
+    [void]$sb.AppendLine("                <div class='class-guide-item'>Reaper <span class='guide-status guide-status-soon'>Soon</span></div>")
+    [void]$sb.AppendLine("                <div class='class-guide-item'>Holy Sword <span class='guide-status guide-status-soon'>Soon</span></div>")
+    [void]$sb.AppendLine("                <div class='class-guide-item'>Shinobi <span class='guide-status guide-status-soon'>Soon</span></div>")
+    [void]$sb.AppendLine("                <div class='class-guide-item'>Lancer <span class='guide-status guide-status-soon'>Soon</span></div>")
+    [void]$sb.AppendLine("                <div class='class-guide-item'>Guitar <span class='guide-status guide-status-soon'>Soon</span></div>")
+    [void]$sb.AppendLine("                <div class='class-guide-item'>Star Caller <span class='guide-status guide-status-soon'>Soon</span></div>")
+    [void]$sb.AppendLine("                <div class='class-guide-item'>Whipmaster <span class='guide-status guide-status-soon'>Soon</span></div>")
+    [void]$sb.AppendLine("                <div class='class-guide-item'>Dragon Nunchaku <span class='guide-status guide-status-soon'>Soon</span></div>")
+    [void]$sb.AppendLine("                <div class='class-guide-item'>Stellar Sphere <span class='guide-status guide-status-soon'>Soon</span></div>")
+    [void]$sb.AppendLine("              </div>")
+    [void]$sb.AppendLine("            </div>")
     [void]$sb.AppendLine("            <button id=`"luckyPackInfoBtn`" class=`"lucky-pack-btn`" type=`"button`" title=`"What are Eidolon Lucky Packs?`" aria-label=`"What are Eidolon Lucky Packs?`">What is <img class=`"lucky-pack-icon`" src=`"assets/icons/I80914.png`" alt=`"Eidolon Lucky Pack`">?</button>")
     [void]$sb.AppendLine("            <button id=`"wishCoinInfoBtn`" class=`"wish-coin-btn`" type=`"button`" title=`"What are Eidolon Wish Coins?`" aria-label=`"What are Eidolon Wish Coins?`">What is <img class=`"wish-coin-icon`" src=`"assets/icons/I81010.png`" alt=`"Eidolon Wish Coin`">?</button>")
     [void]$sb.AppendLine("            <button id=`"limitBreakInfoBtn`" class=`"limit-break-btn`" type=`"button`" title=`"What are Card Breakthrough Devices?`" aria-label=`"What are Card Breakthrough Devices?`">What is <img class=`"limit-break-icon`" src=`"assets/icons/I80781.png`" alt=`"Card Breakthrough Device`">?</button>")
@@ -993,28 +1241,9 @@ function Build-PageHtml {
     [void]$sb.AppendLine("          </div>")
     [void]$sb.AppendLine("        </details>")
     [void]$sb.AppendLine("        <details class=`"info-menu`">")
-    [void]$sb.AppendLine("          <summary class=`"info-menu-toggle`" aria-label=`"Open class guides menu`" data-i18n=`"nav_class_guides`">Class Guides ?</summary>")
-    [void]$sb.AppendLine("          <div class=`"info-menu-panel class-guides-panel`">")
-    [void]$sb.AppendLine("            <div class='class-guide-item'>Duelist <span class='guide-status guide-status-soon'>Soon</span></div>")
-    [void]$sb.AppendLine("            <div class='class-guide-item'>Guardian <span class='guide-status guide-status-soon'>Soon</span></div>")
-    [void]$sb.AppendLine("            <div class='class-guide-item'>Ravager <span class='guide-status guide-status-soon'>Soon</span></div>")
-    [void]$sb.AppendLine("            <div class='class-guide-item'>Wizard <span class='guide-status guide-status-soon'>Soon</span></div>")
-    [void]$sb.AppendLine("            <div class='class-guide-item'>Gunslinger <span class='guide-status guide-status-soon'>Soon</span></div>")
-    [void]$sb.AppendLine("            <div class='class-guide-item'>Grenadier <span class='guide-status guide-status-soon'>Soon</span></div>")
-    [void]$sb.AppendLine("            <div class='class-guide-item'>Sorcerer <span class='guide-status guide-status-soon'>Soon</span></div>")
-    [void]$sb.AppendLine("            <div class='class-guide-item'>Bard <span class='guide-status guide-status-soon'>Soon</span></div>")
-    [void]$sb.AppendLine("            <div class='class-guide-item'>Brawler <span class='guide-status guide-status-soon'>Soon</span></div>")
-    [void]$sb.AppendLine("            <div class='class-guide-item'>Ranger <span class='guide-status guide-status-soon'>Soon</span></div>")
-    [void]$sb.AppendLine("            <div class='class-guide-item'>Ronin <span class='guide-status guide-status-soon'>Soon</span></div>")
-    [void]$sb.AppendLine("            <div class='class-guide-item'>Reaper <span class='guide-status guide-status-soon'>Soon</span></div>")
-    [void]$sb.AppendLine("            <div class='class-guide-item'>Holy Sword <span class='guide-status guide-status-soon'>Soon</span></div>")
-    [void]$sb.AppendLine("            <div class='class-guide-item'>Shinobi <span class='guide-status guide-status-soon'>Soon</span></div>")
-    [void]$sb.AppendLine("            <div class='class-guide-item'>Lancer <span class='guide-status guide-status-soon'>Soon</span></div>")
-    [void]$sb.AppendLine("            <div class='class-guide-item'>Guitar <span class='guide-status guide-status-soon'>Soon</span></div>")
-    [void]$sb.AppendLine("            <div class='class-guide-item'>Star Caller <span class='guide-status guide-status-soon'>Soon</span></div>")
-    [void]$sb.AppendLine("            <div class='class-guide-item'>Whipmaster <span class='guide-status guide-status-soon'>Soon</span></div>")
-    [void]$sb.AppendLine("            <div class='class-guide-item'>Dragon Nunchaku <span class='guide-status guide-status-soon'>Soon</span></div>")
-    [void]$sb.AppendLine("            <div class='class-guide-item'>Stellar Sphere <span class='guide-status guide-status-soon'>Soon</span></div>")
+    [void]$sb.AppendLine("          <summary class=`"info-menu-toggle`" aria-label=`"Open tools menu`" data-i18n=`"nav_tools`">Tools ?</summary>")
+    [void]$sb.AppendLine("          <div class=`"info-menu-panel`">")
+    [void]$sb.AppendLine("            <button id=`"statsCalculatorToolsBtn`" class=`"tools-menu-btn`" type=`"button`" data-i18n=`"tool_stats_calculator`">Stats Calculator</button>")
     [void]$sb.AppendLine("          </div>")
     [void]$sb.AppendLine("        </details>")
     [void]$sb.AppendLine("        <div class='lang-selector' role='group' aria-label='Language'>")
@@ -1028,7 +1257,7 @@ function Build-PageHtml {
     [void]$sb.AppendLine("        <button id=`"themeToggle`" class=`"theme-toggle`" type=`"button`" aria-label=`"Switch to light theme`" title=`"Switch to light theme`"><span id=`"themeIcon`" class=`"theme-icon`"></span></button>")
     [void]$sb.AppendLine("      </div>")
     [void]$sb.AppendLine("    </div>")
-    [void]$sb.AppendLine("    <input id=`"q`" class=`"search`" placeholder=`"Search by Eidolon, combo or bonus...`" data-i18n-placeholder=`"search_placeholder`" title=`"Type to filter combos by Eidolon, combo, or bonus`" aria-label=`"Search combos`">")
+    [void]$sb.AppendLine("    <input id=`"q`" class=`"search`" placeholder=`"Search by Eidolon, match or bonus...`" data-i18n-placeholder=`"search_placeholder`" title=`"Type to filter matches by Eidolon, match, or bonus`" aria-label=`"Search matches`">")
     [void]$sb.AppendLine("  </div></div>")
     [void]$sb.AppendLine("  <div id=`"luckyPackModal`" class=`"lucky-pack-modal-backdrop`" role=`"dialog`" aria-modal=`"true`" aria-labelledby=`"luckyPackTitle`">")
     [void]$sb.AppendLine("    <div class=`"lucky-pack-modal`">")
@@ -1343,7 +1572,7 @@ function Build-PageHtml {
     [void]$sb.AppendLine("              <tr><td>Pet</td><td>4%-6%</td><td>50%</td></tr>")
     [void]$sb.AppendLine("              <tr><td class=`"item-name`">Back Striker</td><td>Hit behind boss</td><td>100%</td><td>50%</td></tr>")
     [void]$sb.AppendLine("              <tr><td class=`"item-name`">Rapid Assault</td><td>SPD over cap bonus</td><td>0.1%-20%</td><td>50%</td></tr>")
-    [void]$sb.AppendLine("              <tr><td class=`"item-name`">Combo</td><td>Eidolon Archive</td><td>2%-21%</td><td>50%</td></tr>")
+    [void]$sb.AppendLine("              <tr><td class=`"item-name`">Match</td><td>Eidolon Archive</td><td>2%-21%</td><td>50%</td></tr>")
     [void]$sb.AppendLine("              <tr><td class=`"item-name`">Holy Chest +240</td><td>8 Weapons +30</td><td>4%</td><td>50%</td></tr>")
     [void]$sb.AppendLine("              <tr><td class=`"item-name`">Zeal</td><td>Attack spec mastery</td><td>10%</td><td>110%</td></tr>")
     [void]$sb.AppendLine("              <tr><td class=`"item-name`">Food / Drink</td><td>Lv101 or Above</td><td>15%</td><td>110%</td></tr>")
@@ -1527,6 +1756,30 @@ function Build-PageHtml {
     [void]$sb.AppendLine("      <div class=`"class-guide-actions`"><button id=`"classGuideCloseBtn`" class=`"class-guide-close`" type=`"button`">Close</button></div>")
     [void]$sb.AppendLine("    </div>")
     [void]$sb.AppendLine("  </div>")
+    [void]$sb.AppendLine("  <div id=`"statsCalculatorModal`" class=`"stats-calculator-modal-backdrop`" role=`"dialog`" aria-modal=`"true`" aria-labelledby=`"statsCalculatorTitle`">")
+    [void]$sb.AppendLine("    <div class=`"stats-calculator-modal`">")
+    [void]$sb.AppendLine("      <h3 id=`"statsCalculatorTitle`" data-i18n='stats_calc_title'>Stats Calculator</h3>")
+    [void]$sb.AppendLine("      <div class='stats-calculator'>")
+    [void]$sb.AppendLine("        <div class='stats-calculator-intro'>")
+    [void]$sb.AppendLine("          <p data-i18n='stats_calc_intro'>Download the base Excel file, fill in how many stars each Eidolon has, and upload it back here to prepare future stat calculations.</p>")
+    [void]$sb.AppendLine("          <p data-i18n='stats_calc_hint'>Use 0 if you do not own the Eidolon, or 1 to 4 for its current star level.</p>")
+    [void]$sb.AppendLine("        </div>")
+    [void]$sb.AppendLine("        <div class='stats-calculator-actions'>")
+    [void]$sb.AppendLine("          <a class='stats-template-link' href='$safeTemplatePath' download data-i18n='stats_calc_download'>Download base Excel</a>")
+    [void]$sb.AppendLine("          <label class='stats-upload-label' for='eidolonStarsUpload' data-i18n='stats_calc_upload'>Upload filled Excel</label>")
+    [void]$sb.AppendLine("          <input id='eidolonStarsUpload' class='stats-upload-input' type='file' accept='.xlsx,.xls,.csv'>")
+    [void]$sb.AppendLine("        </div>")
+    [void]$sb.AppendLine("        <div id='eidolonStarsImportStatus' class='stats-import-status'>")
+    [void]$sb.AppendLine("          <p id='eidolonStarsImportMessage' data-i18n='stats_calc_empty'>No file imported yet.</p>")
+    [void]$sb.AppendLine("          <div id='eidolonStarsSummary' class='stats-summary hide' aria-live='polite'></div>")
+    [void]$sb.AppendLine("          <div id='eidolonStarsCalculatedStats' class='stats-calculated hide' aria-live='polite'></div>")
+    [void]$sb.AppendLine("          <div id='eidolonStarsUpgradeRoutes' class='stats-routes hide' aria-live='polite'></div>")
+    [void]$sb.AppendLine("          <ul id='eidolonStarsImportErrors' class='stats-errors hide'></ul>")
+    [void]$sb.AppendLine("        </div>")
+    [void]$sb.AppendLine("      </div>")
+    [void]$sb.AppendLine("      <div class=`"stats-calculator-close-wrap`"><button id=`"statsCalculatorCloseBtn`" class=`"stats-calculator-close`" type=`"button`" data-i18n=`"btn_close`">Close</button></div>")
+    [void]$sb.AppendLine("    </div>")
+    [void]$sb.AppendLine("  </div>")
     [void]$sb.AppendLine("  <main class=`"wrap`">")
 
     foreach ($cat in $orderedCats) {
@@ -1543,7 +1796,7 @@ function Build-PageHtml {
 
         [void]$sb.AppendLine("    <section class='section' data-section='1'>")
         [void]$sb.AppendLine("      <h2>$cat</h2>")
-        [void]$sb.AppendLine("      <table><thead><tr><th>Combo</th><th>&#9733;&#9733;&#9733;</th><th>&#9733;&#9733;&#9733;&#9733;</th></tr></thead><tbody>")
+        [void]$sb.AppendLine("      <table><thead><tr><th>Match</th><th>&#9733;&#9733;&#9733;</th><th>&#9733;&#9733;&#9733;&#9733;</th></tr></thead><tbody>")
 
         foreach ($it in $items) {
             $comboSb = New-Object System.Text.StringBuilder
@@ -1618,9 +1871,21 @@ function Build-PageHtml {
     [void]$sb.AppendLine("    const usefulLinksInfoBtn = document.getElementById('usefulLinksInfoBtn');")
     [void]$sb.AppendLine("    const usefulLinksModal = document.getElementById('usefulLinksModal');")
     [void]$sb.AppendLine("    const usefulLinksCloseBtn = document.getElementById('usefulLinksCloseBtn');")
+    [void]$sb.AppendLine("    const statsCalculatorToolsBtn = document.getElementById('statsCalculatorToolsBtn');")
+    [void]$sb.AppendLine("    const statsCalculatorModal = document.getElementById('statsCalculatorModal');")
+    [void]$sb.AppendLine("    const statsCalculatorCloseBtn = document.getElementById('statsCalculatorCloseBtn');")
     [void]$sb.AppendLine("    const aboutInfoBtn = document.getElementById('aboutInfoBtn');")
     [void]$sb.AppendLine("    const aboutModal = document.getElementById('aboutModal');")
     [void]$sb.AppendLine("    const aboutCloseBtn = document.getElementById('aboutCloseBtn');")
+    [void]$sb.AppendLine("    const eidolonStarsUpload = document.getElementById('eidolonStarsUpload');")
+    [void]$sb.AppendLine("    const eidolonStarsImportMessage = document.getElementById('eidolonStarsImportMessage');")
+    [void]$sb.AppendLine("    const eidolonStarsSummary = document.getElementById('eidolonStarsSummary');")
+    [void]$sb.AppendLine("    const eidolonStarsCalculatedStats = document.getElementById('eidolonStarsCalculatedStats');")
+    [void]$sb.AppendLine("    const eidolonStarsUpgradeRoutes = document.getElementById('eidolonStarsUpgradeRoutes');")
+    [void]$sb.AppendLine("    const eidolonStarsImportErrors = document.getElementById('eidolonStarsImportErrors');")
+    [void]$sb.AppendLine("    const KNOWN_EIDOLON_NAMES = $knownEidolonsJson;")
+    [void]$sb.AppendLine("    let importedEidolonStars = null;")
+    [void]$sb.AppendLine("    let currentLang = 'en';")
     [void]$sb.AppendLine("    function applyTheme(theme) {")
     [void]$sb.AppendLine("      const t = (theme === 'light') ? 'light' : 'dark';")
     [void]$sb.AppendLine("      document.body.setAttribute('data-theme', t);")
@@ -1710,21 +1975,63 @@ function Build-PageHtml {
     [void]$sb.AppendLine("    aboutCloseBtn.addEventListener('click', closeAboutModal);")
     [void]$sb.AppendLine("    aboutModal.addEventListener('click', (ev) => { if (ev.target === aboutModal) closeAboutModal(); });")
     [void]$sb.AppendLine("    document.addEventListener('keydown', (ev) => { if (ev.key === 'Escape' && aboutModal.classList.contains('show')) closeAboutModal(); });")
+    [void]$sb.AppendLine("    function openStatsCalculatorModal() { statsCalculatorModal.classList.add('show'); }")
+    [void]$sb.AppendLine("    function closeStatsCalculatorModal() { statsCalculatorModal.classList.remove('show'); }")
+    [void]$sb.AppendLine("    statsCalculatorToolsBtn.addEventListener('click', () => { infoMenus.forEach(menu => { if (menu.open) menu.open = false; }); openStatsCalculatorModal(); });")
+    [void]$sb.AppendLine("    statsCalculatorCloseBtn.addEventListener('click', closeStatsCalculatorModal);")
+    [void]$sb.AppendLine("    statsCalculatorModal.addEventListener('click', (ev) => { if (ev.target === statsCalculatorModal) closeStatsCalculatorModal(); });")
+    [void]$sb.AppendLine("    document.addEventListener('keydown', (ev) => { if (ev.key === 'Escape' && statsCalculatorModal.classList.contains('show')) closeStatsCalculatorModal(); });")
     # i18n
     $translationsJs = @'
     const TRANSLATIONS = {
       en: {
         nav_guides: "Guides \u25be",
         nav_class_guides: "Class Guides \u25be",
+                nav_tools: "Tools \u25be",
         btn_what_is: "What is",
+                btn_class_guides: "Class Guides",
         btn_eidolon_leveling: "Eidolon Leveling",
         btn_gear_guide: "Gear Guide",
         btn_boost_damage: "Boost your damage",
         btn_spawn_location: "Eidolon Spawn Location",
         btn_best_eidolons: "Best Eidolons",
         btn_useful_links: "Useful links",
+        tool_stats_calculator: "Stats Calculator",
         btn_close: "Close",
-        search_placeholder: "Search by Eidolon, combo or bonus...",
+        stats_calc_title: "Stats Calculator",
+        stats_calc_intro: "Download the base Excel file, fill in how many stars each Eidolon has, and upload it back here to prepare future stat calculations.",
+        stats_calc_hint: "Use 0 if you do not own the Eidolon, or 1 to 4 for its current star level.",
+        stats_calc_download: "Download base Excel",
+        stats_calc_upload: "Upload filled Excel",
+        stats_calc_empty: "No file imported yet.",
+        stats_calc_loading: "Reading file...",
+        stats_calc_imported: "Imported file",
+        stats_calc_import_failed: "Could not import this file.",
+        stats_calc_library_missing: "The spreadsheet reader could not be loaded. Refresh the page and try again.",
+        stats_calc_invalid_template: "The uploaded file does not match the expected template.",
+        stats_calc_summary_owned: "Owned",
+        stats_calc_summary_total_stars: "Total stars",
+        stats_calc_summary_one_star: "1 star",
+        stats_calc_summary_two_stars: "2 stars",
+        stats_calc_summary_three_stars: "3 stars",
+        stats_calc_summary_four_stars: "4 stars",
+        stats_calc_warnings: "Warnings found while importing:",
+        stats_calc_results_title: "Calculated match bonuses",
+        stats_calc_results_active3: "Active matches at 3 stars",
+        stats_calc_results_active4: "Active matches at 4 stars",
+        stats_calc_results_stat: "Stat",
+        stats_calc_results_total: "Total bonus",
+        stats_calc_results_empty: "No match bonus is active yet with the imported stars.",
+        stats_calc_routes_title: "Best upgrade routes",
+        stats_calc_routes_empty: "No high-impact route found yet. Keep upgrading remaining Eidolons to unlock more matches.",
+        stats_calc_routes_target3: "Target 3 stars",
+        stats_calc_routes_target4: "Target 4 stars",
+        stats_calc_routes_need: "Stars needed",
+        stats_calc_routes_priority: "Priority score",
+        stats_calc_routes_steps: "Steps",
+        stats_calc_routes_get: "Get",
+        stats_calc_routes_upgrade: "Upgrade",
+        search_placeholder: "Search by Eidolon, match or bonus...",
         modal_best_eidolons_title: "Best Eidolons",
         modal_best_eidolons_warning_label: "Outdated list:",
         modal_best_eidolons_warning_text: " this information is from July 2024 and may no longer reflect the current best choices.",
@@ -1838,15 +2145,51 @@ function Build-PageHtml {
       pt: {
         nav_guides: "Guias \u25be",
         nav_class_guides: "Guias de Classe \u25be",
+                nav_tools: "Ferramentas \u25be",
         btn_what_is: "O que \u00e9",
+                btn_class_guides: "Guias de Classe",
         btn_eidolon_leveling: "Nivelar Eidolon",
         btn_gear_guide: "Guia de Equipamento",
         btn_boost_damage: "Aumente seu dano",
         btn_spawn_location: "Local de Apari\u00e7\u00e3o do Eidolon",
         btn_best_eidolons: "Melhores Eidolons",
         btn_useful_links: "Links \u00fateis",
+        tool_stats_calculator: "Calculadora de Stats",
         btn_close: "Fechar",
-        search_placeholder: "Buscar por Eidolon, combo ou b\u00f4nus...",
+        stats_calc_title: "Calculadora de Stats",
+        stats_calc_intro: "Baixe o arquivo Excel base, preencha quantas estrelas cada Eidolon tem e envie o arquivo de volta aqui para preparar os c\u00e1lculos futuros.",
+        stats_calc_hint: "Use 0 se voc\u00ea n\u00e3o tiver o Eidolon, ou de 1 a 4 para o n\u00edvel atual de estrelas.",
+        stats_calc_download: "Baixar Excel base",
+        stats_calc_upload: "Enviar Excel preenchido",
+        stats_calc_empty: "Nenhum arquivo foi importado ainda.",
+        stats_calc_loading: "Lendo arquivo...",
+        stats_calc_imported: "Arquivo importado",
+        stats_calc_import_failed: "N\u00e3o foi poss\u00edvel importar este arquivo.",
+        stats_calc_library_missing: "O leitor de planilhas n\u00e3o foi carregado. Atualize a p\u00e1gina e tente novamente.",
+        stats_calc_invalid_template: "O arquivo enviado n\u00e3o corresponde ao modelo esperado.",
+        stats_calc_summary_owned: "Possu\u00eddos",
+        stats_calc_summary_total_stars: "Total de estrelas",
+        stats_calc_summary_one_star: "1 estrela",
+        stats_calc_summary_two_stars: "2 estrelas",
+        stats_calc_summary_three_stars: "3 estrelas",
+        stats_calc_summary_four_stars: "4 estrelas",
+        stats_calc_warnings: "Avisos encontrados durante a importa\u00e7\u00e3o:",
+        stats_calc_results_title: "B\u00f4nus de match calculados",
+        stats_calc_results_active3: "Matches ativos com 3 estrelas",
+        stats_calc_results_active4: "Matches ativos com 4 estrelas",
+        stats_calc_results_stat: "Status",
+        stats_calc_results_total: "B\u00f4nus total",
+        stats_calc_results_empty: "Nenhum b\u00f4nus de match est\u00e1 ativo com as estrelas importadas.",
+        stats_calc_routes_title: "Melhores rotas de upgrade",
+        stats_calc_routes_empty: "Nenhuma rota de alto impacto encontrada ainda. Continue evoluindo os Eidolons restantes para liberar mais matches.",
+        stats_calc_routes_target3: "Meta 3 estrelas",
+        stats_calc_routes_target4: "Meta 4 estrelas",
+        stats_calc_routes_need: "Estrelas necess\u00e1rias",
+        stats_calc_routes_priority: "Score de prioridade",
+        stats_calc_routes_steps: "Passos",
+        stats_calc_routes_get: "Obter",
+        stats_calc_routes_upgrade: "Evoluir",
+        search_placeholder: "Buscar por Eidolon, match ou b\u00f4nus...",
         modal_best_eidolons_title: "Melhores Eidolons",
         modal_best_eidolons_warning_label: "Lista desatualizada:",
         modal_best_eidolons_warning_text: " estas informa\u00e7\u00f5es s\u00e3o de julho de 2024 e podem n\u00e3o refletir mais as melhores escolhas atuais.",
@@ -1968,7 +2311,7 @@ function Build-PageHtml {
         btn_best_eidolons: "Mejores Eidolons",
         btn_useful_links: "Enlaces \u00fatiles",
         btn_close: "Cerrar",
-        search_placeholder: "Buscar por Eidolon, combo o bonificaci\u00f3n...",
+        search_placeholder: "Buscar por Eidolon, match o bonificaci\u00f3n...",
         modal_best_eidolons_title: "Mejores Eidolons",
         modal_best_eidolons_warning_label: "Lista desactualizada:",
         modal_best_eidolons_warning_text: " esta informaci\u00f3n es de julio de 2024 y puede no reflejar las mejores opciones actuales.",
@@ -2212,7 +2555,7 @@ function Build-PageHtml {
         btn_best_eidolons: "Meilleurs Eidolons",
         btn_useful_links: "Liens utiles",
         btn_close: "Fermer",
-        search_placeholder: "Rechercher par Eidolon, combo ou bonus...",
+        search_placeholder: "Rechercher par Eidolon, match ou bonus...",
         modal_best_eidolons_title: "Meilleurs Eidolons",
         modal_best_eidolons_warning_label: "Liste obsol\u00e8te :",
         modal_best_eidolons_warning_text: " ces informations datent de juillet 2024 et peuvent ne plus refl\u00e9ter les meilleurs choix actuels.",
@@ -2324,24 +2667,32 @@ function Build-PageHtml {
         modal_dungeon_note: "<strong>Note :</strong> Les Eidolons non list\u00e9s ici peuvent \u00eatre obtenus dans la boutique de Points de Fid\u00e9lit\u00e9, en achetant \u00e0 d'autres joueurs, via la Maison des Ventes, en jouant \u00e0 Paragon ou lors d'\u00e9v\u00e9nements en jeu.",
       },
     };
+        function t(key, fallback) {
+            const localized = TRANSLATIONS[currentLang] || TRANSLATIONS.en;
+            if (localized[key] !== undefined) return localized[key];
+            if (TRANSLATIONS.en[key] !== undefined) return TRANSLATIONS.en[key];
+            return fallback || key;
+        }
     function applyLang(lang) {
-      const t = TRANSLATIONS[lang] || TRANSLATIONS.en;
-      document.querySelectorAll('[data-i18n]').forEach(el => {
+            currentLang = TRANSLATIONS[lang] ? lang : 'en';
+            const messages = TRANSLATIONS[currentLang] || TRANSLATIONS.en;
+            document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
-        if (t[key] !== undefined) el.textContent = t[key];
+                if (messages[key] !== undefined) el.textContent = messages[key];
       });
       document.querySelectorAll('[data-i18n-html]').forEach(el => {
         const key = el.getAttribute('data-i18n-html');
-        if (t[key] !== undefined) el.innerHTML = t[key];
+                if (messages[key] !== undefined) el.innerHTML = messages[key];
       });
       document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
         const key = el.getAttribute('data-i18n-placeholder');
-        if (t[key] !== undefined) el.setAttribute('placeholder', t[key]);
+                if (messages[key] !== undefined) el.setAttribute('placeholder', messages[key]);
       });
       document.querySelectorAll('.lang-btn').forEach(btn => {
-        btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
+                btn.classList.toggle('active', btn.getAttribute('data-lang') === currentLang);
       });
-      localStorage.setItem('eidolonLang', lang);
+            localStorage.setItem('eidolonLang', currentLang);
+            renderImportedEidolonStars();
     }
     const infoMenus = Array.from(document.querySelectorAll('.info-menu'));
     infoMenus.forEach(menu => {
@@ -2363,6 +2714,248 @@ function Build-PageHtml {
     foreach ($line in $translationsJs -split "`n") {
         [void]$sb.AppendLine($line.TrimEnd())
     }
+    [void]$sb.AppendLine("    function normalizeImportValue(value) {")
+    [void]$sb.AppendLine("      return String(value || '')")
+    [void]$sb.AppendLine("        .replace(/[ðÐ]/g, 'd')")
+    [void]$sb.AppendLine("        .replace(/[þÞ]/g, 'th')")
+    [void]$sb.AppendLine("        .normalize('NFD')")
+    [void]$sb.AppendLine("        .replace(/[\u0300-\u036f]/g, '')")
+    [void]$sb.AppendLine("        .toLowerCase()")
+    [void]$sb.AppendLine("        .replace(/[^a-z0-9]+/g, '')")
+    [void]$sb.AppendLine("        .trim();")
+    [void]$sb.AppendLine("    }")
+    [void]$sb.AppendLine("    const knownEidolonMap = new Map(KNOWN_EIDOLON_NAMES.map(name => [normalizeImportValue(name), name]));")
+    [void]$sb.AppendLine("    function parseBonusText(rawText) {")
+    [void]$sb.AppendLine("      const text = String(rawText || '').trim();")
+    [void]$sb.AppendLine("      if (!text) return null;")
+    [void]$sb.AppendLine("      const match = text.match(/^(.*?)([-+]?\d+(?:\.\d+)?)\s*(%)?\s*$/);")
+    [void]$sb.AppendLine("      if (!match) return null;")
+    [void]$sb.AppendLine("      const value = Number(match[2]);")
+    [void]$sb.AppendLine("      if (!Number.isFinite(value)) return null;")
+    [void]$sb.AppendLine("      const stat = match[1].replace(/[+\-\s]+$/, '').trim();")
+    [void]$sb.AppendLine("      if (!stat) return null;")
+    [void]$sb.AppendLine("      return { stat, value, unit: match[3] ? '%' : '' };")
+    [void]$sb.AppendLine("    }")
+    [void]$sb.AppendLine("    function calculateImportedEidolonStats(importedMap) {")
+    [void]$sb.AppendLine("      const totals = new Map();")
+    [void]$sb.AppendLine("      let active3 = 0;")
+    [void]$sb.AppendLine("      let active4 = 0;")
+    [void]$sb.AppendLine("      const rows = Array.from(document.querySelectorAll('section[data-section] tbody tr'));")
+    [void]$sb.AppendLine("      rows.forEach(row => {")
+    [void]$sb.AppendLine("        const eidolonNames = Array.from(row.querySelectorAll('.combo-item span:last-child')).map(el => el.textContent.trim()).filter(Boolean);")
+    [void]$sb.AppendLine("        if (!eidolonNames.length) return;")
+    [void]$sb.AppendLine("        const stars = eidolonNames.map(name => Number(importedMap[name] || 0));")
+    [void]$sb.AppendLine("        const has3 = stars.every(star => star >= 3);")
+    [void]$sb.AppendLine("        const has4 = stars.every(star => star >= 4);")
+    [void]$sb.AppendLine("        if (!has3 && !has4) return;")
+    [void]$sb.AppendLine("        const star3Text = (row.cells[1] && row.cells[1].textContent) ? row.cells[1].textContent.trim() : '';")
+    [void]$sb.AppendLine("        const star4Text = (row.cells[2] && row.cells[2].textContent) ? row.cells[2].textContent.trim() : '';")
+    [void]$sb.AppendLine("        if (has3) {")
+    [void]$sb.AppendLine("          active3 += 1;")
+    [void]$sb.AppendLine("          const parsed3 = parseBonusText(star3Text);")
+    [void]$sb.AppendLine("          if (parsed3) {")
+    [void]$sb.AppendLine('            const key3 = `${parsed3.stat}|${parsed3.unit}`;')
+    [void]$sb.AppendLine("            totals.set(key3, { stat: parsed3.stat, unit: parsed3.unit, value: (totals.get(key3)?.value || 0) + parsed3.value });")
+    [void]$sb.AppendLine("          }")
+    [void]$sb.AppendLine("        }")
+    [void]$sb.AppendLine("        if (has4) {")
+    [void]$sb.AppendLine("          active4 += 1;")
+    [void]$sb.AppendLine("          const parsed4 = parseBonusText(star4Text);")
+    [void]$sb.AppendLine("          if (parsed4) {")
+    [void]$sb.AppendLine('            const key4 = `${parsed4.stat}|${parsed4.unit}`;')
+    [void]$sb.AppendLine("            totals.set(key4, { stat: parsed4.stat, unit: parsed4.unit, value: (totals.get(key4)?.value || 0) + parsed4.value });")
+    [void]$sb.AppendLine("          }")
+    [void]$sb.AppendLine("        }")
+    [void]$sb.AppendLine("      });")
+    [void]$sb.AppendLine("      const stats = Array.from(totals.values()).sort((a, b) => a.stat.localeCompare(b.stat));")
+    [void]$sb.AppendLine("      return { active3, active4, stats };")
+    [void]$sb.AppendLine("    }")
+    [void]$sb.AppendLine("    function formatBonusValue(value, unit) {")
+    [void]$sb.AppendLine('      const rounded = Number.isInteger(value) ? String(value) : value.toFixed(2).replace(/\.0+$/, '''').replace(/(\.\d*[1-9])0+$/, ''$1'');')
+    [void]$sb.AppendLine("      const prefix = value > 0 ? '+' : '';")
+    [void]$sb.AppendLine('      return `${prefix}${rounded}${unit || ''''}`;')
+    [void]$sb.AppendLine("    }")
+    [void]$sb.AppendLine("    function normalizeStatPriorityKey(statName) {")
+    [void]$sb.AppendLine("      return String(statName || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();")
+    [void]$sb.AppendLine("    }")
+    [void]$sb.AppendLine("    function getStatPriorityWeight(statName) {")
+    [void]$sb.AppendLine("      const key = normalizeStatPriorityKey(statName);")
+    [void]$sb.AppendLine("      if (key === 'dmg dealt') return 100;")
+    [void]$sb.AppendLine("      if (key === 'dmg dealt to boss monsters') return 98;")
+    [void]$sb.AppendLine("      if (key === 'crit dmg') return 95;")
+    [void]$sb.AppendLine("      if (key === 'crit dmg to boss monsters') return 93;")
+    [void]$sb.AppendLine("      if (key === 'pen') return 90;")
+    [void]$sb.AppendLine("      if (key === 'max crit dmg') return 86;")
+    [void]$sb.AppendLine("      if (key === 'main weapon dmg' || key === 'main weapon damage increased by') return 84;")
+    [void]$sb.AppendLine("      if (key.startsWith('main weapon damage')) return 84;")
+    [void]$sb.AppendLine("      if (key.includes('dmg dealt to boss monsters')) return 98;")
+    [void]$sb.AppendLine("      if (key.includes('crit dmg to boss monsters')) return 93;")
+    [void]$sb.AppendLine("      if (key.includes('max crit dmg')) return 86;")
+    [void]$sb.AppendLine("      if (key.includes('dmg dealt')) return 100;")
+    [void]$sb.AppendLine("      if (key.includes('crit dmg')) return 95;")
+    [void]$sb.AppendLine("      if (key === 'pen' || key.includes(' pen')) return 90;")
+    [void]$sb.AppendLine("      if (key.includes('dmg') || key.includes('crit') || key.includes('pen')) return 62;")
+    [void]$sb.AppendLine("      return 35;")
+    [void]$sb.AppendLine("    }")
+    [void]$sb.AppendLine("    function buildUpgradeRouteRecommendations(importedMap) {")
+    [void]$sb.AppendLine("      const routes = [];")
+    [void]$sb.AppendLine("      const rows = Array.from(document.querySelectorAll('section[data-section] tbody tr'));")
+    [void]$sb.AppendLine("      rows.forEach(row => {")
+    [void]$sb.AppendLine("        const eidolonNames = Array.from(row.querySelectorAll('.combo-item span:last-child')).map(el => el.textContent.trim()).filter(Boolean);")
+    [void]$sb.AppendLine("        if (!eidolonNames.length) return;")
+    [void]$sb.AppendLine("        const currentStars = eidolonNames.map(name => Number(importedMap[name] || 0));")
+    [void]$sb.AppendLine("        const bonus3 = parseBonusText((row.cells[1] && row.cells[1].textContent) ? row.cells[1].textContent.trim() : '');")
+    [void]$sb.AppendLine("        const bonus4 = parseBonusText((row.cells[2] && row.cells[2].textContent) ? row.cells[2].textContent.trim() : '');")
+    [void]$sb.AppendLine("        const has3 = currentStars.every(star => star >= 3);")
+    [void]$sb.AppendLine("        const has4 = currentStars.every(star => star >= 4);")
+    [void]$sb.AppendLine("        const evaluateTier = (targetTier, bonus, alreadyActive) => {")
+    [void]$sb.AppendLine("          if (!bonus || alreadyActive) return;")
+    [void]$sb.AppendLine("          const needs = eidolonNames.map((name, idx) => ({")
+    [void]$sb.AppendLine("            name,")
+    [void]$sb.AppendLine("            current: currentStars[idx],")
+    [void]$sb.AppendLine("            need: Math.max(0, targetTier - currentStars[idx])")
+    [void]$sb.AppendLine("          })).filter(item => item.need > 0);")
+    [void]$sb.AppendLine("          if (!needs.length) return;")
+    [void]$sb.AppendLine("          const totalNeed = needs.reduce((acc, item) => acc + item.need, 0);")
+    [void]$sb.AppendLine("          const missingCount = needs.filter(item => item.current === 0).length;")
+    [void]$sb.AppendLine("          const weight = getStatPriorityWeight(bonus.stat);")
+    [void]$sb.AppendLine("          const magnitude = Math.abs(Number(bonus.value) || 0);")
+    [void]$sb.AppendLine("          const score = ((weight * (magnitude || 1)) / (totalNeed + (missingCount * 1.2) + (eidolonNames.length * 0.2)));")
+    [void]$sb.AppendLine("          routes.push({")
+    [void]$sb.AppendLine("            stat: bonus.stat,")
+    [void]$sb.AppendLine("            bonusValue: bonus.value,")
+    [void]$sb.AppendLine("            unit: bonus.unit,")
+    [void]$sb.AppendLine("            targetTier,")
+    [void]$sb.AppendLine("            combo: eidolonNames,")
+    [void]$sb.AppendLine("            needs,")
+    [void]$sb.AppendLine("            totalNeed,")
+    [void]$sb.AppendLine("            score,")
+    [void]$sb.AppendLine("            weight")
+    [void]$sb.AppendLine("          });")
+    [void]$sb.AppendLine("        };")
+    [void]$sb.AppendLine("        evaluateTier(3, bonus3, has3);")
+    [void]$sb.AppendLine("        evaluateTier(4, bonus4, has4);")
+    [void]$sb.AppendLine("      });")
+    [void]$sb.AppendLine("      routes.sort((a, b) => b.score - a.score || b.weight - a.weight || a.totalNeed - b.totalNeed);")
+    [void]$sb.AppendLine("      return routes.slice(0, 8);")
+    [void]$sb.AppendLine("    }")
+    [void]$sb.AppendLine("    function renderUpgradeRoutes(importedMap) {")
+    [void]$sb.AppendLine("      const routes = buildUpgradeRouteRecommendations(importedMap);")
+    [void]$sb.AppendLine("      if (!routes.length) {")
+    [void]$sb.AppendLine('        eidolonStarsUpgradeRoutes.innerHTML = `<h4>${t(''stats_calc_routes_title'')}</h4><p class="stats-route-empty">${t(''stats_calc_routes_empty'')}</p>`;')
+    [void]$sb.AppendLine("        eidolonStarsUpgradeRoutes.classList.remove('hide');")
+    [void]$sb.AppendLine("        return;")
+    [void]$sb.AppendLine("      }")
+    [void]$sb.AppendLine('      const listHtml = routes.map((route, idx) => {')
+    [void]$sb.AppendLine('        const targetLabel = route.targetTier === 4 ? t(''stats_calc_routes_target4'') : t(''stats_calc_routes_target3'');')
+    [void]$sb.AppendLine('        const steps = route.needs.map(item => item.current === 0')
+    [void]$sb.AppendLine('          ? `${t(''stats_calc_routes_get'')} ${item.name} (${item.need}★)`')
+    [void]$sb.AppendLine('          : `${t(''stats_calc_routes_upgrade'')} ${item.name} ${item.current}→${route.targetTier}`')
+    [void]$sb.AppendLine('        ).join('' | '');')
+    [void]$sb.AppendLine('        return `<div class="stats-route-item"><strong>#${idx + 1} ${route.stat} ${formatBonusValue(route.bonusValue, route.unit)}</strong><div class="stats-route-meta">${targetLabel} • ${t(''stats_calc_routes_need'')}: ${route.totalNeed} • ${t(''stats_calc_routes_priority'')}: ${route.score.toFixed(2)}</div><div class="stats-route-steps"><strong>${t(''stats_calc_routes_steps'')}:</strong> ${steps}</div></div>`;')
+    [void]$sb.AppendLine('      }).join('''');')
+    [void]$sb.AppendLine('      eidolonStarsUpgradeRoutes.innerHTML = `<h4>${t(''stats_calc_routes_title'')}</h4><div class="stats-routes-list">${listHtml}</div>`;')
+    [void]$sb.AppendLine("      eidolonStarsUpgradeRoutes.classList.remove('hide');")
+    [void]$sb.AppendLine("    }")
+    [void]$sb.AppendLine("    function renderImportedEidolonStars() {")
+    [void]$sb.AppendLine("      if (!importedEidolonStars) {")
+    [void]$sb.AppendLine("        eidolonStarsSummary.classList.add('hide');")
+    [void]$sb.AppendLine("        eidolonStarsCalculatedStats.classList.add('hide');")
+    [void]$sb.AppendLine("        eidolonStarsUpgradeRoutes.classList.add('hide');")
+    [void]$sb.AppendLine("        eidolonStarsImportErrors.classList.add('hide');")
+    [void]$sb.AppendLine("        return;")
+    [void]$sb.AppendLine("      }")
+    [void]$sb.AppendLine('      eidolonStarsImportMessage.textContent = `${t(''stats_calc_imported'')}: ${importedEidolonStars.fileName}`;')
+    [void]$sb.AppendLine("      const summaryCards = [")
+    [void]$sb.AppendLine("        { label: t('stats_calc_summary_owned'), value: importedEidolonStars.summary.owned },")
+    [void]$sb.AppendLine("        { label: t('stats_calc_summary_total_stars'), value: importedEidolonStars.summary.totalStars },")
+    [void]$sb.AppendLine("        { label: t('stats_calc_summary_one_star'), value: importedEidolonStars.summary.starCounts[1] },")
+    [void]$sb.AppendLine("        { label: t('stats_calc_summary_two_stars'), value: importedEidolonStars.summary.starCounts[2] },")
+    [void]$sb.AppendLine("        { label: t('stats_calc_summary_three_stars'), value: importedEidolonStars.summary.starCounts[3] },")
+    [void]$sb.AppendLine("        { label: t('stats_calc_summary_four_stars'), value: importedEidolonStars.summary.starCounts[4] },")
+    [void]$sb.AppendLine("      ];")
+    [void]$sb.AppendLine('      eidolonStarsSummary.innerHTML = summaryCards.map(card => `<div class="stats-summary-card"><strong>${card.value}</strong><span>${card.label}</span></div>`).join('''');')
+    [void]$sb.AppendLine("      eidolonStarsSummary.classList.remove('hide');")
+    [void]$sb.AppendLine("      const calculated = calculateImportedEidolonStats(importedEidolonStars.imported);")
+    [void]$sb.AppendLine("      if (calculated.stats.length > 0 || calculated.active3 > 0 || calculated.active4 > 0) {")
+    [void]$sb.AppendLine('        const summary = `<div class="stats-calculated-summary"><span><strong>${t(''stats_calc_results_active3'')}:</strong> ${calculated.active3}</span><span><strong>${t(''stats_calc_results_active4'')}:</strong> ${calculated.active4}</span></div>`;')
+    [void]$sb.AppendLine('        const tableRows = calculated.stats.map(item => `<tr><td>${item.stat}</td><td>${formatBonusValue(item.value, item.unit)}</td></tr>`).join('''');')
+    [void]$sb.AppendLine("        const table = calculated.stats.length > 0")
+    [void]$sb.AppendLine('          ? `<table class="stats-calculated-table"><thead><tr><th>${t(''stats_calc_results_stat'')}</th><th>${t(''stats_calc_results_total'')}</th></tr></thead><tbody>${tableRows}</tbody></table>`')
+    [void]$sb.AppendLine('          : `<p class="stats-calculated-empty">${t(''stats_calc_results_empty'')}</p>`;')
+    [void]$sb.AppendLine('        eidolonStarsCalculatedStats.innerHTML = `<h4>${t(''stats_calc_results_title'')}</h4>${summary}${table}`;')
+    [void]$sb.AppendLine("        eidolonStarsCalculatedStats.classList.remove('hide');")
+    [void]$sb.AppendLine("      } else {")
+    [void]$sb.AppendLine('        eidolonStarsCalculatedStats.innerHTML = `<h4>${t(''stats_calc_results_title'')}</h4><p class="stats-calculated-empty">${t(''stats_calc_results_empty'')}</p>`;')
+    [void]$sb.AppendLine("        eidolonStarsCalculatedStats.classList.remove('hide');")
+    [void]$sb.AppendLine("      }")
+    [void]$sb.AppendLine("      renderUpgradeRoutes(importedEidolonStars.imported);")
+    [void]$sb.AppendLine("      if (importedEidolonStars.errors.length > 0) {")
+    [void]$sb.AppendLine('        eidolonStarsImportErrors.innerHTML = [`<li><strong>${t(''stats_calc_warnings'')}</strong></li>`].concat(importedEidolonStars.errors.map(error => `<li>${error}</li>`)).join('''');')
+    [void]$sb.AppendLine("        eidolonStarsImportErrors.classList.remove('hide');")
+    [void]$sb.AppendLine("      } else {")
+    [void]$sb.AppendLine("        eidolonStarsImportErrors.innerHTML = '';")
+    [void]$sb.AppendLine("        eidolonStarsImportErrors.classList.add('hide');")
+    [void]$sb.AppendLine("      }")
+    [void]$sb.AppendLine("    }")
+    [void]$sb.AppendLine("    function parseImportedEidolonStars(sheetRows) {")
+    [void]$sb.AppendLine("      if (!Array.isArray(sheetRows) || sheetRows.length < 2) {")
+    [void]$sb.AppendLine("        throw new Error(t('stats_calc_invalid_template'));")
+    [void]$sb.AppendLine("      }")
+    [void]$sb.AppendLine("      const imported = {}; const errors = []; const seen = new Set();")
+    [void]$sb.AppendLine("      for (const [index, row] of sheetRows.slice(1).entries()) {")
+    [void]$sb.AppendLine("        const rawName = String((row && row[0]) || '').trim();")
+    [void]$sb.AppendLine("        const rawStars = String((row && row[1]) || '').trim();")
+    [void]$sb.AppendLine("        if (!rawName && !rawStars) continue;")
+    [void]$sb.AppendLine("        const canonicalName = knownEidolonMap.get(normalizeImportValue(rawName));")
+    [void]$sb.AppendLine('        if (!canonicalName) { errors.push(`Row ${index + 2}: unknown Eidolon ''${rawName}''.`); continue; }')
+    [void]$sb.AppendLine("        const stars = Number(rawStars);")
+    [void]$sb.AppendLine('        if (!Number.isInteger(stars) || stars < 0 || stars > 4) { errors.push(`Row ${index + 2}: invalid star value ''${rawStars}'' for ${canonicalName}.`); continue; }')
+    [void]$sb.AppendLine('        if (seen.has(canonicalName)) { errors.push(`Row ${index + 2}: duplicate Eidolon ''${canonicalName}''.`); continue; }')
+    [void]$sb.AppendLine("        imported[canonicalName] = stars;")
+    [void]$sb.AppendLine("        seen.add(canonicalName);")
+    [void]$sb.AppendLine("      }")
+    [void]$sb.AppendLine("      KNOWN_EIDOLON_NAMES.forEach(name => { if (imported[name] === undefined) imported[name] = 0; });")
+    [void]$sb.AppendLine("      const summary = { owned: 0, totalStars: 0, starCounts: { 1: 0, 2: 0, 3: 0, 4: 0 } };")
+    [void]$sb.AppendLine("      Object.values(imported).forEach(stars => {")
+    [void]$sb.AppendLine("        summary.totalStars += stars;")
+    [void]$sb.AppendLine("        if (stars > 0) summary.owned += 1;")
+    [void]$sb.AppendLine("        if (summary.starCounts[stars] !== undefined) summary.starCounts[stars] += 1;")
+    [void]$sb.AppendLine("      });")
+    [void]$sb.AppendLine("      return { imported, summary, errors };")
+    [void]$sb.AppendLine("    }")
+    [void]$sb.AppendLine("    async function handleEidolonStarsUpload(event) {")
+    [void]$sb.AppendLine("      const file = event.target.files && event.target.files[0];")
+    [void]$sb.AppendLine("      if (!file) return;")
+    [void]$sb.AppendLine("      eidolonStarsImportMessage.textContent = t('stats_calc_loading');")
+    [void]$sb.AppendLine("      eidolonStarsSummary.classList.add('hide');")
+    [void]$sb.AppendLine("      eidolonStarsCalculatedStats.classList.add('hide');")
+    [void]$sb.AppendLine("      eidolonStarsUpgradeRoutes.classList.add('hide');")
+    [void]$sb.AppendLine("      eidolonStarsImportErrors.classList.add('hide');")
+    [void]$sb.AppendLine("      if (!window.XLSX) {")
+    [void]$sb.AppendLine("        importedEidolonStars = null;")
+    [void]$sb.AppendLine("        eidolonStarsImportMessage.textContent = t('stats_calc_library_missing');")
+    [void]$sb.AppendLine("        return;")
+    [void]$sb.AppendLine("      }")
+    [void]$sb.AppendLine("      try {")
+    [void]$sb.AppendLine("        const workbook = XLSX.read(await file.arrayBuffer(), { type: 'array' });")
+    [void]$sb.AppendLine("        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];")
+    [void]$sb.AppendLine("        const sheetRows = XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: '', blankrows: false });")
+    [void]$sb.AppendLine("        const parsed = parseImportedEidolonStars(sheetRows);")
+    [void]$sb.AppendLine("        importedEidolonStars = { fileName: file.name, imported: parsed.imported, summary: parsed.summary, errors: parsed.errors };")
+    [void]$sb.AppendLine("        renderImportedEidolonStars();")
+    [void]$sb.AppendLine("      } catch (error) {")
+    [void]$sb.AppendLine("        importedEidolonStars = null;")
+    [void]$sb.AppendLine("        eidolonStarsSummary.classList.add('hide');")
+    [void]$sb.AppendLine("        eidolonStarsCalculatedStats.classList.add('hide');")
+    [void]$sb.AppendLine("        eidolonStarsUpgradeRoutes.classList.add('hide');")
+    [void]$sb.AppendLine("        eidolonStarsImportErrors.classList.add('hide');")
+    [void]$sb.AppendLine('        eidolonStarsImportMessage.textContent = `${t(''stats_calc_import_failed'')} ${error.message || ''''}`.trim();')
+    [void]$sb.AppendLine("      } finally {")
+    [void]$sb.AppendLine("        event.target.value = '';")
+    [void]$sb.AppendLine("      }")
+    [void]$sb.AppendLine("    }")
+    [void]$sb.AppendLine("    eidolonStarsUpload.addEventListener('change', handleEidolonStarsUpload);")
     [void]$sb.AppendLine("    q.addEventListener('input', () => {")
     [void]$sb.AppendLine("      const term = q.value.toLowerCase().trim();")
     [void]$sb.AppendLine("      document.querySelectorAll('section[data-section]').forEach(sec => {")
@@ -2506,6 +3099,10 @@ $luckyPackTotals = [pscustomobject]@{
     DEF = 23 * $eidolonCount
 }
 
+$starsTemplateFullPath = Join-Path (Get-Location) $StarsTemplatePath
+Write-Host "      Generating Eidolon stars template..."
+New-EidolonStarsTemplateFile -KnownEidolonNames $knownEidolonNames -OutputPath $starsTemplateFullPath
+
 Write-Host "      Loading Eidolon Wishes stat totals..."
 $wishStatsTotals = @(Get-EidolonWishStatsTotals -WishesUrl $EidolonWishesUrl)
 if ($wishStatsTotals.Count -gt 0) {
@@ -2529,7 +3126,7 @@ try {
 }
 
 Write-Host "[3/4] Building page HTML..."
-$page = Build-PageHtml -Rows $rows -IconMap $iconMap -DungeonGuideItems $dungeonGuideItems -WishStatsTotals $wishStatsTotals -LuckyPackTotals $luckyPackTotals
+$page = Build-PageHtml -Rows $rows -IconMap $iconMap -DungeonGuideItems $dungeonGuideItems -WishStatsTotals $wishStatsTotals -LuckyPackTotals $luckyPackTotals -KnownEidolonNames $knownEidolonNames -StarsTemplatePath $StarsTemplatePath
 
 Write-Host "[4/4] Saving file..."
 Set-Content -Path $OutputHtml -Value $page -Encoding UTF8
