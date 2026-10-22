@@ -34,6 +34,6 @@ jobs:
             exit 0
           }
 
-          git add index.html version.txt assets/eidolons
+          git add index.html version.txt assets/eidolons assets/eidolon-stars-template.xlsx
           git commit -m "chore: auto-update eidolon archive"
           git push
