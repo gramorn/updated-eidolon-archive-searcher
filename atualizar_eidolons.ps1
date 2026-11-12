@@ -1,4 +1,4 @@
-﻿param(
+param(
     [string]$Url = "https://www.aurakingdom-db.com/charts/eidolon-archive",
     [string]$OutputHtml = "index.html",
     [string]$AssetsDir = "assets/eidolons",

@@ -1,10 +1,9 @@
 # Eidolon Archive
 
-A lightweight Aura Kingdom Eidolon Archive app that:
+A static Aura Kingdom Eidolon Archive website that:
 
 - downloads latest combo data from AuraKingdom-DB
 - rebuilds a local static page with icons and category totals
-- opens as a desktop-like app window on Windows
 - can be hosted as a static website (for example, GitHub Pages)
 
 This project uses updated data from AuraKingdom-DB and is also inspired by the Eidolon Archive by Xilla:
@@ -23,37 +22,24 @@ https://github.com/gramorn/updated-eidolon-archive-searcher.git
 - Local icon cache in `assets/eidolons`
 - Search filter for combos
 - Category grouping with combined totals
-- Simple desktop launcher for Windows (Edge app mode)
+- Additional guides for Eidolons, dungeons, and character progression
 
 ## Project Structure
 
-- `index.html`: generated static page shown to users
+- `index.html`: static website shown to users
 - `assets/eidolons`: cached eidolon icons
+- `assets/icons`: cached guide icons
 - `atualizar_eidolons.ps1`: fetches latest data and regenerates `index.html`
-- `EidolonApp.ps1`: desktop launcher with update check prompt
-- `Iniciar.vbs`: silent launcher for `EidolonApp.ps1`
 - `version.txt`: current combo-count version used by updater
 
-## Requirements
+## Website
 
-- Windows PowerShell 5.1 or later
-- Internet connection for update runs
-- Microsoft Edge (for app window mode)
+The site is static and can be served directly from `index.html`. No desktop app or installation is required.
 
-## Local Usage
+## Updating site data
 
-### 1. Regenerate data and page
+To fetch the latest data and regenerate the site locally, use Windows PowerShell 5.1 or later:
 
 ```powershell
 ./atualizar_eidolons.ps1
-```
-
-### 2. Open desktop app
-
-Double-click `Iniciar.vbs`
-
-Or run:
-
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File "EidolonApp.ps1"
 ```
