@@ -20,6 +20,7 @@ https://github.com/gramorn/updated-eidolon-archive-searcher.git
 
 - Automatic data fetch from source page
 - Local icon cache in `assets/eidolons`
+- Automatically regenerated Excel template with the current Eidolon list
 - Search filter for combos
 - Category grouping with combined totals
 - Additional guides for Eidolons, dungeons, and character progression
@@ -28,8 +29,14 @@ https://github.com/gramorn/updated-eidolon-archive-searcher.git
 
 - `index.html`: static website shown to users
 - `assets/eidolons`: cached eidolon icons
+<<<<<<< HEAD
 - `assets/icons`: cached guide icons
 - `atualizar_eidolons.ps1`: fetches latest data and regenerates `index.html`
+=======
+- `atualizar_eidolons.ps1`: fetches latest data and regenerates `index.html` and the Eidolon stars Excel template
+- `EidolonApp.ps1`: desktop launcher with update check prompt
+- `Iniciar.vbs`: silent launcher for `EidolonApp.ps1`
+>>>>>>> 74ec9173706d2a993a79f1f3fc10ac1863ad7805
 - `version.txt`: current combo-count version used by updater
 
 ## Website
